@@ -42,6 +42,22 @@ Every code carries exactly one severity. This is the honesty requirement made me
 
 `held` is the severity the project exists for. It is the difference between *"we could not match these fourteen rows"* and a chart that silently averaged them away.
 
+### Severity is one axis. Scope is the other.
+
+Severity says what happened to a row. **Scope says which figures may use it.** A row is not simply valid or invalid — it is valid for some analyses and not others:
+
+| Scope | Requires |
+|---|---|
+| `total` | date, branch, amount |
+| `product` | the above, plus a resolved product |
+| `quantity` | the above, plus a parseable quantity |
+
+A row with no product name is `warning` with scope `{total}`: it belongs in its branch's total and not in the product breakdown.
+
+Every aggregate therefore carries a completeness statement beside the number — *"this branch's total includes 34 rows with no product, worth AED 2,100."* Traceability says where a figure came from; completeness says what is missing from it, and the second is the question that nearly cost the client a branch.
+
+The full model, the new codes below, and the client's own wording are in `docs/discovery/IMPACT.md`.
+
 **Choosing a severity — the test:** can a person resolve this in the UI and make the row usable?
 
 - Yes → `held`
@@ -73,7 +89,7 @@ Initial set. The authoritative list is the enum in `backend/app/errors/`; this t
 |---|---|---|
 | `ROW_MISSING_DATE` | `rejected` | No date — cannot be placed in time |
 | `ROW_MISSING_BRANCH` | `rejected` | No branch — cannot be attributed |
-| `ROW_MISSING_PRODUCT` | `rejected` | No product — cannot be counted in product analysis |
+| `ROW_MISSING_PRODUCT` | `warning`, scope `{total}` | No product. **Counted in the branch total, excluded from the product breakdown**, and declared. Rejecting it would under-report branch totals invisibly — see `docs/discovery/IMPACT.md` §2.2 |
 | `ROW_MISSING_AMOUNT` | `rejected` | No amount — nothing to report |
 | `ROW_MISSING_QUANTITY` | `warning` | Amount present; quantity null and flagged |
 | `ROW_AMOUNT_UNPARSEABLE` | `rejected` | Amount present but not a number after `domain/numbers` |

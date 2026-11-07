@@ -44,12 +44,12 @@ Everything through `Intl`, with an explicit locale.
 
 ```ts
 // no
-`${value.toFixed(2)} SAR`
+`${value.toFixed(2)} AED`
 value.toLocaleString()
 `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`
 
 // yes
-new Intl.NumberFormat(locale, { style: 'currency', currency: 'SAR' }).format(value)
+new Intl.NumberFormat(locale, { style: 'currency', currency: 'AED' }).format(value)
 new Intl.NumberFormat(locale).format(value)
 new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(d)
 ```
@@ -61,7 +61,9 @@ new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(d)
 - Dates are stored as UTC and formatted at the edge.
 - Percentages go through `style: 'percent'`.
 
-**Arabic numerals:** `Intl` renders Western digits for `ar-SA` by default, which is what Saudi business reporting uses. If the client asks for Arabic-Indic digits, that is a `numberingSystem: 'arab'` option in one place — which is the reason for the shared helpers.
+**The client is in the UAE and trades in dirhams (AED).** Locales are `ar-AE` and `en-AE`. An earlier draft of this file said Saudi riyals — that was our own assumption, never flagged as a guess, and the client corrected it. Currency belongs in configuration, not in a literal anywhere.
+
+**Arabic numerals:** `Intl` renders Western digits for `ar-AE` by default, which is what UAE business reporting uses. If the client asks for Arabic-Indic digits, that is a `numberingSystem: 'arab'` option in one place — which is the reason for the shared helpers.
 
 ---
 

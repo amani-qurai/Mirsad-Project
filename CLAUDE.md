@@ -27,8 +27,12 @@ Read before you build:
 | Document | What it settles |
 |---|---|
 | `docs/decisions/ADR-0001-technology-stack.md` | Stack, and the layering in §6 |
+| `docs/discovery/ANSWERS.md` | The client's own words. Where this disagrees with anything else, this wins |
+| `docs/discovery/IMPACT.md` | What those answers changed, including where our earlier defaults were wrong |
 | `docs/PROJECT-PLAN.md` | Sprints, task IDs, Definition of Done |
 | `docs/SPEC.md` | Scope — including what is explicitly *not* built |
+
+The client trades in **dirhams (AED)**, locales `ar-AE` and `en-AE`. An earlier draft said Saudi riyals; that was our assumption and it was wrong.
 
 ---
 
@@ -93,6 +97,10 @@ The difference matters more than it looks, and it is the honesty requirement mad
 | **rejected** | Cannot be used at all | Excluded, listed with its reason |
 
 An ambiguous date is **held**, never guessed. A product match below threshold is **held**, never merged. "Held" rows are visible in the report with what we need from a human in order to proceed.
+
+**And a second axis: scope.** Severity says what happened to a row; scope says which figures may use it. A row with a date, a branch and an amount but no product belongs in that branch's total and not in the product breakdown — so it is a `warning` with scope `{total}`, not a rejection. Rejecting it would under-report branch totals with no visible symptom, which is the original failure this project exists to prevent.
+
+Every figure therefore states its own completeness: *"this branch's total includes 34 rows with no product, worth AED 2,100."* Traceability says where a number came from; completeness says what is missing from it.
 
 Collapsing `held` into `rejected` would quietly discard recoverable data. Collapsing it into `warning` would put unverified numbers on the dashboard. Keep all three.
 
