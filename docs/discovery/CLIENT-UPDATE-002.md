@@ -69,9 +69,9 @@ I am also not going to close the gap by planning to work six-day weeks. An estim
 
 ## Your fortnight is not my build time
 
-This matters more than the five days, and it is the one place I have changed what Option 2 means.
+This matters more than the six and a half days, and it is the one place I have changed what Option 2 means.
 
-The ten working days between delivery and your review are **yours**. Nothing new gets built in them. Between 10 and 18 December the only changes I make are fixes to problems you or Rania actually hit.
+**Every working day between delivery and your review is yours** — the six or seven above. Nothing new gets built in them. Between 10 and 18 December the only changes I make are fixes to problems you or Rania actually hit.
 
 If I spent that fortnight building the remaining features, the system would change under you every few days in exactly the period you are trying to learn whether you can trust it — and your whole reason for choosing Option 2 disappears. You said it yourself: the value is walking into that meeting with numbers you have tested.
 
@@ -101,7 +101,7 @@ What I would not move, for completeness: tracing a figure back to its rows, the 
 
 ---
 
-## Two things I need
+## Two things I need before I can write the specification
 
 ### 1. Your trading calendar
 
