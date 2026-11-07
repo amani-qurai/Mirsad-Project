@@ -381,9 +381,30 @@ The original cut list offered **comparison-period charts**. The client's answers
 
 ### Branching
 ```
-main                    protected — never committed to directly, never force-pushed
+main                    never committed to directly, never force-pushed
 task/<ID>-<slug>        e.g. task/M-004-arabic-normalisation
 ```
+
+> **`main` is not protected on GitHub. This rule is convention, not enforcement.**
+>
+> This document previously described `main` as *"protected"*. It never was — GitHub has been showing *"Your main branch isn't protected"* throughout, and the word was aspiration written in the present tense. Verified 8 November against the branch rules page, the rulesets page and the repository home banner, all three of which agree.
+>
+> **Why it is written this way rather than left as a to-do.** A plan that claims an enforcement which does not exist is worse than one that admits a gap: the first makes everyone stop checking. Until the rule is created, the only thing keeping commits off `main` is that one person is pushing and that person knows the rule.
+>
+> **What should be enforced**, and the settings that do it ([Settings → Branches](https://github.com/amani-qurai/Mirsad-Project/settings/branches) → *Add classic branch protection rule*):
+>
+> | Setting | Serves |
+> |---|---|
+> | Branch name pattern `main` | — |
+> | Require a pull request before merging | NN-10, *"never commit to `main`"* |
+> | Require approvals → **1** | NN-10, *"never merge without review"* |
+> | Dismiss stale approvals when new commits are pushed | Stops a review of an older diff counting for a newer one |
+> | Do not allow bypassing the above settings | Applies all of it to the repository owner, who is the only person pushing |
+> | *Allow force pushes* and *Allow deletions* left **unticked** | NN-10, *"never force-push"* — unticked is what blocks them |
+>
+> **A trap worth recording, because it cost an afternoon.** GitHub's identity check (*sudo mode*) fires **after** Create is clicked, not before, and it discards the form. The first attempt therefore always appears to do nothing. Submit once to clear the check, then fill the form again and submit for real. Separately, the Claude browser pane and the user's own Chrome keep entirely separate sessions, so authenticating in one does nothing for the other.
+>
+> Tracked as action 12 in §13. **This note is removed only when the rule is verified present, not when it is attempted.**
 
 ### Commits
 ```
@@ -466,6 +487,7 @@ Nothing is quietly absorbed. The client should always know what her request cost
 | 9 | Write `SPEC.md`, with block one and block two scope separated | Amani | All development |
 | 10 | Approve PR #1 | Imam | Sprint 1 |
 | 11 | *(By 4 Dec)* confirm block two starts 21 Dec or 4 Jan | Suha | Block two only |
+| 12 | **Protect `main` on GitHub** — settings listed in §9. Verified absent 8 Nov | Amani | Nothing today; NN-10 is convention-only until it exists |
 
 **Not before then: not one line of application code.**
 
