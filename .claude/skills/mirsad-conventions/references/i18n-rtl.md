@@ -44,12 +44,12 @@ Everything through `Intl`, with an explicit locale.
 
 ```ts
 // no
-`${value.toFixed(2)} AED`
+`${value.toFixed(2)} ILS`
 value.toLocaleString()
 `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`
 
 // yes
-new Intl.NumberFormat(locale, { style: 'currency', currency: 'AED' }).format(value)
+new Intl.NumberFormat(locale, { style: 'currency', currency: 'ILS' }).format(value)
 new Intl.NumberFormat(locale).format(value)
 new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(d)
 ```
@@ -61,9 +61,15 @@ new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(d)
 - Dates are stored as UTC and formatted at the edge.
 - Percentages go through `style: 'percent'`.
 
-**The client is in the UAE and trades in dirhams (AED).** Locales are `ar-AE` and `en-AE`. An earlier draft of this file said Saudi riyals — that was our own assumption, never flagged as a guess, and the client corrected it. Currency belongs in configuration, not in a literal anywhere.
+**The client is in Palestine and trades in shekels (ILS).** Locales are `ar-PS` and `en-PS`; timezone **Asia/Hebron**; the trading week runs **Saturday to Thursday, Friday closed**.
 
-**Arabic numerals:** `Intl` renders Western digits for `ar-AE` by default, which is what UAE business reporting uses. If the client asks for Arabic-Indic digits, that is a `numberingSystem: 'arab'` option in one place — which is the reason for the shared helpers.
+This line has been wrong twice. It said Saudi riyals (our own unflagged assumption), was corrected to dirhams by the client, and was corrected again to shekels by the client when a question about *branch names* exposed it. **Currency, locale, timezone and week start belong in configuration, never in a literal** — the number of times this value has moved is the argument.
+
+`en-PS` may not exist in a given ICU build and will fall back to `en`. That is fine: currency and digits are set explicitly through the options, not inferred from the region.
+
+**Arabic numerals:** `Intl` may render Arabic-Indic digits for `ar-PS`, which is **not** what the client's accounting uses — her files and reports are in Western digits. Set `numberingSystem: 'latn'` explicitly in the shared helpers rather than relying on the locale default, and never leave it to chance: the digits in a financial figure are the first thing she will notice.
+
+Note the asymmetry with `domain/numbers`, which must *read* Arabic-Indic digits out of the incoming files. We parse both and display one.
 
 ---
 
