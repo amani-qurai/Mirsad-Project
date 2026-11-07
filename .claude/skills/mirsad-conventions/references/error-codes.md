@@ -54,7 +54,7 @@ Severity says what happened to a row. **Scope says which figures may use it.** A
 
 A row with no product name is `warning` with scope `{total}`: it belongs in its branch's total and not in the product breakdown.
 
-Every aggregate therefore carries a completeness statement beside the number — *"this branch's total includes 34 rows with no product, worth AED 2,100."* Traceability says where a figure came from; completeness says what is missing from it, and the second is the question that nearly cost the client a branch.
+Every aggregate therefore carries a completeness statement beside the number — *"this branch's total includes 34 rows with no product, worth ILS 2,100."* Traceability says where a figure came from; completeness says what is missing from it, and the second is the question that nearly cost the client a branch.
 
 The full model, the new codes below, and the client's own wording are in `docs/discovery/IMPACT.md`.
 

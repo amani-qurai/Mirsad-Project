@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | **Proposed** — the recommendation is ours; the choice is the client's |
+| **Status** | **Accepted** 9 November 2026 — hosting approved by the client |
 | **Date** | 2026-11-08 |
 | **Supersedes** | Nothing. `ADR-0001` §"Deferred" left hosting open deliberately |
 | **Task** | M-028 — *"confirm hosting pricing against live figures before anything is quoted"* |
@@ -47,19 +47,23 @@ She told us: *"a few thousand rows per branch per week"* (answer 10), eleven bra
 
 ## 4. Figures
 
-All prices read from the vendors' own pricing pages on **2026-11-08**. Converted at **1 USD = 3.6725 AED**, the long-standing dirham peg — see §7 for the one caveat on that rate.
+All prices read from the vendors' own pricing pages on **2026-11-08**.
+
+> **Currency corrected 9 November.** This document was written in **AED**. The client is in **Palestine** and trades in **shekels (ILS)** — she corrected herself after our question about branch names. Figures below are now ILS, converted at **1 USD = 3.17** (early November 2026).
+>
+> **Unlike the dirham, the shekel floats.** The dirham was pegged, so a converted figure stayed true. This one will not. **The dollar figures are the contract; the shekel figures are a snapshot.** At rates between 3.00 and 3.40 the monthly cost runs **ILS 86–98** and the annual **ILS 1,037–1,175**. The client should budget the top of that band.
 
 ### DigitalOcean — the priced option
 
 Chosen as the basis because its own pricing page gave complete, unambiguous figures. Not because it is cheapest.
 
-| | Monthly | AED/mo | AED/yr |
+| | Monthly | ILS/mo | ILS/yr |
 |---|---|---|---|
-| A — 2 GB / 1 vCPU, Postgres on the box, weekly backups | $14.40 | **53** | 635 |
-| B — 2 GB / 2 vCPU, Postgres on the box, weekly backups | $21.60 | **79** | 952 |
-| **C — 4 GB / 2 vCPU, Postgres on the box, weekly backups** | **$28.80** | **106** | **1,269** |
-| D — 2 GB droplet + managed Postgres (1 GB) | $29.55 | 109 | 1,302 |
-| E — 4 GB droplet + managed Postgres (1 GB) | $43.95 | 161 | 1,937 |
+| A — 2 GB / 1 vCPU, Postgres on the box, weekly backups | $14.40 | **46** | 548 |
+| B — 2 GB / 2 vCPU, Postgres on the box, weekly backups | $21.60 | **68** | 822 |
+| **C — 4 GB / 2 vCPU, Postgres on the box, weekly backups** | **$28.80** | **91** | **1,096** |
+| D — 2 GB droplet + managed Postgres (1 GB) | $29.55 | 94 | 1,124 |
+| E — 4 GB droplet + managed Postgres (1 GB) | $43.95 | 139 | 1,672 |
 
 Components: Basic Droplet 4 GiB / 2 vCPU / 80 GiB / 4 TB transfer = **$24.00**; backups at **20 % weekly** or 30 % daily; cheapest managed PostgreSQL (1 GiB RAM, 1 vCPU, 10–30 GiB) = **$15.15**.
 
@@ -72,7 +76,7 @@ Because of what is actually irreplaceable here, which is a smaller thing than th
 | Raw files, transactions, aggregates | **Reproducible.** She has the original files and the pipeline is deterministic — that is what the golden-file tests guarantee |
 | **Rania's resolutions and the alias table** | **Gone.** Nobody can re-derive a human decision. It means asking her to redo weeks of work |
 
-The irreplaceable part is *small* — tens of thousands of rows. It does not need a managed database; it needs **a nightly dump taken off the machine**, which is a cron job and a few hundred compressed megabytes. Paying AED 55/month for managed Postgres to protect data that a nightly `pg_dump` protects for nothing is buying the wrong thing.
+The irreplaceable part is *small* — tens of thousands of rows. It does not need a managed database; it needs **a nightly dump taken off the machine**, which is a cron job and a few hundred compressed megabytes. Paying ILS 48/month for managed Postgres to protect data that a nightly `pg_dump` protects for nothing is buying the wrong thing.
 
 What a weekly droplet snapshot alone would cost her: **up to seven days of Rania's decisions.** That is the risk to close, and it is cheap to close.
 
@@ -80,24 +84,24 @@ What a weekly droplet snapshot alone would cost her: **up to seven days of Rania
 
 **Option C, plus a nightly database dump pulled off the server.**
 
-| | AED/mo |
+| | ILS/mo |
 |---|---|
-| 4 GB / 2 vCPU droplet, Postgres in the same compose stack | 88 |
-| Weekly droplet backups (20 %) | 18 |
+| 4 GB / 2 vCPU droplet, Postgres in the same compose stack | 76 |
+| Weekly droplet backups (20 %) | 15 |
 | Nightly dump → the office machine | 0 |
-| **Total** | **≈ 106** |
-| *If she would rather the dump went to object storage than a PC* | *+18* |
+| **Total** | **≈ 91** · ILS 1,096/yr |
+| *If she would rather the dump went to object storage than a PC* | *+16* |
 
-TLS is free (Let's Encrypt). A domain is a separate, small annual cost — **not quoted here, because we have not checked it**, and `.ae` differs from `.com`. It is single-digit dirhams a month either way, and it will be confirmed before it is stated.
+TLS is free (Let's Encrypt). A domain is a separate, small annual cost — **not quoted here, because we have not checked it**, and `.ps` differs from `.com`. It is single-digit shekels a month either way, and it will be confirmed before it is stated.
 
 ## 5. Options considered and not recommended
 
 | Option | Why not |
 |---|---|
 | **Hetzner** | Would roughly halve the bill. Their own page shows shared-vCPU from **€6.49/mo excl. VAT** and currently marks the cheaper line *"Currently not available"*, and third-party reports of 2026 price rises and plan retirements conflict with each other. **We could not confirm a current plan, price and stock from Hetzner's own page, so it is not the basis of the quote.** Worth revisiting at deployment — it is real money |
-| **Oracle Cloud Always Free** | Could be AED 0, and has UAE regions. But the free Arm quota was reportedly halved in June 2026, free capacity is frequently unavailable in a given region, and free instances can be reclaimed. *"Free but may be withdrawn"* is the wrong trade for the system her branch decisions depend on |
+| **Oracle Cloud Always Free** | Could be free, and has regional datacenters. But the free Arm quota was reportedly halved in June 2026, free capacity is frequently unavailable in a given region, and free instances can be reclaimed. *"Free but may be withdrawn"* is the wrong trade for the system her branch decisions depend on |
 | **Fly.io** | Clear official pricing (shared-cpu-2x/2 GB at $13.39/mo, volumes $0.15/GB/mo) but managed Postgres starts at **$38/mo**, and no Middle East region is listed. Worse fit at higher cost |
-| **AWS / Azure in the Gulf** | AWS Lightsail is not offered in `me-central-1`; the equivalent on EC2 or Azure UAE North is several times the above for this workload. Only worth it if residency becomes a requirement |
+| **AWS / Azure regionally** | Several times the above for this workload. Residency turned out not to be a requirement (§6), so this is moot |
 | **Vercel + a hosted database** | Splits one Docker Compose stack across two platforms and two bills to host a three-user internal tool. Adds operational surface, not value |
 
 ## 6. Region, latency and residency
@@ -105,24 +109,24 @@ TLS is free (Let's Encrypt). A domain is a separate, small annual cost — **not
 **No provider in the priced list has a Gulf datacenter.** DigitalOcean's nearest is **Bangalore**, then Frankfurt and London.
 
 - **Latency is not a concern.** A weekly-use dashboard with three users does not notice 50 ms or 130 ms. Saying otherwise would be inventing a problem to justify a more expensive region.
-- **Residency is probably not a concern, and this needs confirming rather than assuming.** Till exports in this project hold transaction ids, product names, amounts, dates and branches — **no customer personal data**, as far as the brief and the thirteen answers describe. If that is wrong, or if she has a contractual or group-policy reason to keep data in the UAE, the Gulf options in §5 come back and the figure changes materially. **Ask; do not assume.** We have already assumed one thing about this business's jurisdiction and had the currency corrected.
+- **Residency: asked, and answered.** The client confirmed on 9 November that she knows of no rule — a family business, and the till exports carry no customer personal data. The question was worth asking rather than assuming, and it cost one line. Note that the same letter corrected the country itself, which is why assuming would have been doubly wrong.
 
 ## 7. What this figure does not include
 
-The completeness rule, applied to a price. The number above is AED 106/month **and**:
+The completeness rule, applied to a price. The number above is ILS 91/month **and**:
 
 - **No domain** — small, annual, and not yet checked.
 - **Nothing during development.** Hosting starts when we deploy, not now.
 - **No email sending.** Emailing the weekly report was never in scope.
 - **Not a backup of her own files.** The system keeps what it is given; it is not her archive.
 - **Not our time.** Deployment is M-027/M-028 work inside the agreed days; ongoing maintenance after delivery is not priced in this project at all, and she should hear that separately rather than discover it.
-- **One unverified input:** the 3.6725 peg. `centralbank.ae` refused automated access, so the rate comes from several secondary sources that agree and from its being a peg rather than a floating rate. **The vendor bills in USD** — the dollar figures are the verified ones and the dirham figures are derived, which is the right way round and makes this caveat harmless.
+- **One moving input:** the **3.17** exchange rate, from several secondary sources agreeing on early November 2026. **The shekel floats**, so this figure drifts in a way the dirham one would not have. **The vendor bills in USD** — the dollar figures are the contract and the shekel figures are derived, which keeps the drift visible rather than hidden inside a number she is asked to approve.
 
 ## 8. Decision required
 
 | Who | What |
 |---|---|
-| **Suha** | Host it, or run it on the office machine? *Note the §2 link: the phone view effectively requires hosting* |
-| **Suha** | Confirm there is no UAE data-residency requirement |
+| ~~Suha~~ | ✅ **Hosted — approved 9 November**, at roughly this figure |
+| ~~Suha~~ | ✅ **No residency requirement** |
 | **Amani** | Re-check Hetzner at deployment, and the domain price before quoting it |
 | **Amani** | Promote this ADR to **Accepted** once she chooses, and record the choice |
