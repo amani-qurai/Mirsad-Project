@@ -5,7 +5,7 @@
 | **To** | Suha Qasem — Nakheel Retail |
 | **From** | Amani |
 | **Date** | 2026-11-11 |
-| **Status** | Ready to send |
+| **Status** | **Sent 11 November 2026**, via Imam |
 | **Needs** | The review notes. Nothing else |
 
 ---

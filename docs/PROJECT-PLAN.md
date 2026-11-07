@@ -331,7 +331,7 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 | `docs/discovery/CLIENT-REPLY-002.md` | **Received 9 Nov** — ILS not AED, the trading calendar, Tulkarem is hand-typed, block two from 4 Jan |
 | `docs/discovery/CLIENT-UPDATE-003.md` | **Sent 9 Nov** — shekel figures, the calendar cost, the Tulkarem decision, staged delivery, and the Ramallah finding |
 | `docs/discovery/CLIENT-REPLY-003.md` | **Received 11 Nov** — all eleven branches' hours, holidays, every outstanding decision approved, and a request for the retrospective |
-| `docs/discovery/CLIENT-UPDATE-004.md` | Drafted — the measured deficits, Jericho corrected, Bethlehem's date corrected, and what the retrospective can and cannot answer |
+| `docs/discovery/CLIENT-UPDATE-004.md` | **Sent 11 Nov** — the measured deficits, Jericho corrected, Bethlehem's date corrected, and what the retrospective can and cannot answer |
 | Rania's six weeks of real files | **Sunday** |
 
 ### Still open, and blocking `SPEC.md`
