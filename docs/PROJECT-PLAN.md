@@ -161,6 +161,7 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 | Deliverable | State |
 |---|---|
 | `docs/decisions/ADR-0001-technology-stack.md` | Written, in PR #1 |
+| `docs/decisions/ADR-0002-hosting-and-deployment.md` | **Proposed** — figures verified 8 Nov, ≈ AED 106/mo. Awaiting the client's choice |
 | `docs/discovery/QUESTIONS.md` | Sent |
 | `docs/discovery/ANSWERS.md` | **Received** — all thirteen answered |
 | `docs/discovery/IMPACT.md` | Written — five defaults changed, three of our assumptions corrected |
@@ -176,6 +177,8 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 | **The trading calendar** — which days each branch does not trade, and which day the week starts on | Week boundaries decide every period comparison; non-trading days decide whether an empty day is normal or a missing file; the branch's local timezone decides which date a late-evening sale lands on. All three are invisible when wrong. **Not one of the thirteen questions covered this** | Update 002 |
 | The Tulkarem file Rania calls *"not really a file"* | If it is a PDF, a scan or a typed table, format handling is a spec decision rather than a sprint-1 surprise. M-008 sniffs CSV-named-`.xls`, not documents | Update 002 |
 | Rania's interview | NN: the client made it a condition. `RANIA-INTERVIEW.md` | §5 |
+| **Data residency** — any requirement that the data stays in the UAE | No priced provider has a Gulf datacenter (`ADR-0002` §6). If a rule exists, the hosting option and the figure both change materially | Update 002 |
+| **Hosted or office machine** — and the client may not have seen that the phone view requires hosting | Decides whether M-029 is worth building at all, and whether `ADR-0002` applies | Update 002 |
 | Whether block two starts 21 Dec or 4 Jan | Scheduling only — needed by 4 December, not now | Update 002 |
 
 ---
@@ -305,7 +308,7 @@ She narrowed "mobile" to **one screen, read-only: branch totals for a date range
 | M-025 | Playwright E2E ✂ *one happy path per locale* | 0.75 |
 | M-026 | Security review and public-repo hygiene | 0.5 |
 | M-027 | README, delivery guide, acceptance walkthrough on a clean machine | 1.0 |
-| M-028 | Confirm hosting pricing against live figures before anything is quoted | 0.25 |
+| M-028 | ~~Confirm hosting pricing against live figures before anything is quoted~~ ✅ **done 8 Nov** — `ADR-0002`. Pulled forward out of Sprint 4 because the client had been promised it twice | 0.25 *(spent)* |
 
 ### Deferred by the cut — tell the client
 
@@ -326,7 +329,9 @@ She narrowed "mobile" to **one screen, read-only: branch totals for a date range
 |---|---|---|---|
 | **One** | Sprints 1–2 reduced per §7.1, plus M-018 – M-022 and M-029 | 23.75 | Thu 10 Dec |
 | **Freeze** | Her fortnight. Defect fixes only; nothing new lands | — | 10–18 Dec |
-| **Two** | M-012, M-013 remainder, M-023, M-024 – M-028, the deferred rows above | 9.0 | after 20 Dec |
+| **Two** | M-012, M-013 remainder, M-023, M-024 – M-027, the deferred rows above | 8.75 | after 20 Dec |
+
+*M-028 is already done (0.25 d spent, 8 Nov), so 32.75 days of scope has 32.5 remaining.*
 
 ### Never cut, under any circumstance
 
@@ -452,7 +457,7 @@ Nothing is quietly absorbed. The client should always know what her request cost
 |---|---|---|---|
 | 1 | ~~Decide between options A, B and C~~ | — | ✅ **Option C chosen** 8 Nov |
 | 2 | Send `CLIENT-UPDATE-002.md` | Amani | Items 3–6 |
-| 3 | **Confirm the hosting figure** — promised "this week" in update 001, now twice | Amani | A promise already made |
+| 3 | ~~Confirm the hosting figure~~ | — | ✅ **Done** — `ADR-0002`, ≈ **AED 106/mo**. The "tens of dirhams" in update 001 was itself unchecked and is corrected |
 | 4 | Get the **trading calendar** — non-trading days per branch, week start, timezone | Suha | `domain/dates`, every comparison, `SPEC.md` |
 | 5 | Get the **Tulkarem file** Rania calls *"not really a file"* | Rania | Whether document parsing is in scope at all |
 | 6 | Ask Suha to speak to Rania herself before the interview | Suha | The quality of item 7 |

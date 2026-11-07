@@ -6,7 +6,7 @@
 | **From** | Amani |
 | **Date** | 2026-11-08 |
 | **Status** | Ready to send |
-| **Needs** | A decision on the phone view, and two answers |
+| **Needs** | Two decisions — the phone view and hosting — and three answers |
 
 ---
 
@@ -139,17 +139,56 @@ Sunday, live, with the files open: yes, please.
 
 ---
 
-## Still owed from me
+## Hosting — the figure, and a correction to it
 
-The hosting figure, this week, as promised — separately from everything above.
+**About AED 106 a month.** Roughly AED 1,270 a year.
+
+I told you last week it would be *"tens of dirhams a month rather than hundreds"*. That was itself a number I had not checked, which is a poor thing to have written in a letter about not quoting unchecked numbers. It holds for the configurations that are too small for your data. The one I would actually put your figures on is a little over a hundred.
+
+Where it goes:
+
+| | AED/month |
+|---|---|
+| The server — 4 GB of memory, 2 processors, 80 GB of disk | 88 |
+| Weekly server backups | 18 |
+| A nightly copy of the database, pulled to a machine in your office | 0 |
+| **Total** | **≈ 106** |
+
+**Why not cheaper.** Half that buys a server with 2 GB of memory. It would run, until the Sunday job is parsing eleven files while the database and the website are both using memory, and then it would be slow on the one day of the week it is used. Yours is about 3.4 GB of data a year — because we keep the original row next to every figure, which is what lets me show you the line a number came from.
+
+**Why not a managed database, which sounds safer.** Because of what is actually irreplaceable, and it is a smaller thing than you would expect. If that server vanished tomorrow, the files, the transactions and every total could be rebuilt automatically — you have the original files and the system is deterministic by design. **What could not be rebuilt is Rania's decisions.** Nobody can re-derive a human judgement that two product names are the same thing; losing them means asking her to do weeks of work again. That is a small amount of data, and a nightly copy protects it for nothing. Paying AED 55 a month for a managed database to protect it would be buying the wrong thing.
+
+**The cheaper option I am not quoting.** A European provider would roughly halve this. I could not confirm a current price and availability from their own pricing page — their cheapest line is showing as unavailable and the second-hand figures disagree with each other — so it is not the number I am sending you. I will re-check it at deployment, because it is real money.
+
+### The part you may not have connected
+
+**The baseline is zero.** Running this on a machine in the office costs nothing, and that is a genuine option.
+
+But a screen served from a PC in your office **is not reachable from a hotel.** The phone view you asked for only exists if this is hosted. Your two questions turn out to be one question, and I would rather point that out than quote you for two things you thought were separate.
+
+### What AED 106 does not include
+
+A domain name — small, annual, and I have not checked it, so I am not giving you a figure. Nothing at all during the build; hosting starts when we deploy. Not email. And not my time after delivery — ongoing maintenance is not priced anywhere in this project, and you should hear that from me now rather than discover it in February.
+
+### One question back
+
+**Is there any requirement that this data stays inside the UAE?** None of the providers I priced has a Gulf data centre. For a weekly dashboard the distance makes no practical difference, and as far as I can tell from your answers the till exports contain no customer personal information — only transaction numbers, products, amounts, dates and branches.
+
+But if there is a rule, a contract or a group policy I do not know about, the options change and so does the price. I am asking because I assumed something about your jurisdiction once already this month, and it was the currency.
+
+The full workings, including the four options I rejected and why, are in the repository as `ADR-0002`.
 
 ---
 
 ## What I need back
 
 1. **The phone view in the first block, or after your review?** My recommendation: first block, at the cost of one of your seven days.
-2. **The trading calendar.**
-3. **The Tulkarem file** — today if Rania can.
-4. *(By 4 December, not now)* block two starting 21 December or 4 January.
+2. **Hosted, or on the office machine?** These two are linked — the phone view needs hosting. AED 106 a month.
+3. **The trading calendar.**
+4. **The Tulkarem file** — today if Rania can.
+5. **Any rule about the data staying in the UAE** — even "I do not think so" is a useful answer.
+6. *(By 4 December, not now)* block two starting 21 December or 4 January.
+
+Items 1 and 2 are decisions and I need them to plan. Items 3 to 5 are answers I need before I write the specification, and 3 is the one that changes code.
 
 Amani
