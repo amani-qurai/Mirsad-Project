@@ -210,14 +210,13 @@ Also outstanding: six weeks of real files, arriving Sunday. Thresholds tuned on 
 
 ## 9. Schedule
 
-The answers add about **five net days**. The plan was four weeks.
+The answers add about **five net days**.
 
-| Option | |
-|---|---|
-| **Five weeks** *(recommended)* | Absorbs the new work. Keeps the cut list in reserve for genuine surprises, which the real files will supply. |
-| Four weeks, cut now | Hold the date and drop the §7 cut-list items immediately rather than at the week-2 checkpoint. Loses the safety margin before the risky files even arrive. |
+Acting on that prompted a re-estimate of every task rather than of phases, and it found a larger problem that the answers did not cause: **the original four-week figure was never sound.** Summed task by task, the work is ≈ 31 days after every available cut — about six weeks.
 
-Recommending five. The alternative spends the reserve before the sprint that needs it.
+The revised numbers, the three options, and the decision taken are in [`PROJECT-PLAN.md`](../PROJECT-PLAN.md) §1. The short version: four weeks is being held, the cut list is spent immediately, and four weeks therefore delivers the engine and a minimal dashboard rather than the full nine-point acceptance list.
+
+One cut in the original list is no longer available. Comparison-period charts were item 2, and answers 7 and 9 are entirely about comparison fairness — cutting it would remove the thing that nearly cost the client a branch. A cut list written before the client answers is a guess.
 
 ---
 
