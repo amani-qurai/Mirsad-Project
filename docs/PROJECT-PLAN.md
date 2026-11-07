@@ -212,6 +212,68 @@ She has not agreed to that, and it is not ours to assume. The plan is built with
 
 **The recommendation is to defer**, on the grounds that the phone view's value is *after* the review — she will be at her desk for the meeting itself — while three testing days instead of one is worth more on 20 December than mobile access she has lived without for years.
 
+> ✅ **Deferred to January, confirmed by the client 11 November.** She also noted that the earlier yes was not treated as covering the new arithmetic. Recording that because it is the behaviour to repeat, not a compliment to keep.
+
+### 1.13 The hours arrived, and the finding is four branches, not one
+
+`CLIENT-REPLY-003.md` supplied opening hours for all eleven. Standard week is **66 hours** — six days, Saturday to Thursday, 09:00–20:00, Friday closed.
+
+| Branch | h/week | Deficit | Cause |
+|---|---|---|---|
+| **Salfit** | 54 | **−18.2%** | 10:00–19:00. Opened March; trades short while establishing |
+| **Qalqilya** | 60 | **−9.1%** | Closes 19:00, every day, always |
+| **Hebron** | 61 | **−7.6%** | Thursday closes 15:00 |
+| **Ramallah** | 63 | **−4.5%** | Sunday opens 12:00 |
+| Jericho | 66 | **none** | 08:00–19:00 — *shifted earlier, not shorter* |
+| The other six | 66 | — | — |
+
+**Three things fall out of this, and the first matters most.**
+
+**1. Ramallah has the smallest deficit of the four.** The branch she has worried about for four years, and questioned its manager over, is handicapped **4.5%** — while Salfit, which she reads as *"finding its feet slowly"*, is handicapped **four times** as much.
+
+Whether 4.5% actually moved Ramallah's ranking depends entirely on how close the quarters were. If the bottom three sat within a few per cent of each other, it is decisive. If Ramallah trailed by twenty, it is noise. **We cannot know from here and must not imply otherwise** — which is exactly why the client's retrospective request (M-035) is worth a day.
+
+**2. Jericho is not affected.** She listed it as a variation; 08:00–19:00 is the same eleven hours as 09:00–20:00. It is *shifted*, not short. The distinction still matters for day boundaries and intra-day comparison, but Jericho does not belong in the deficit group and must not be marked as if it did.
+
+**3. Never silently adjust.** The temptation is to normalise everything to sales-per-hour and show that. **Do not.** Salfit genuinely sells less in absolute terms — it is open fewer hours by choice — and the absolute figure is what pays its rent. Normalising hides one true fact in order to reveal another.
+
+**Both numbers, always, side by side: raw total and sales per trading hour, with the deficit stated.** Adjusting is not the remedy for a hidden handicap. Declaring is.
+
+### 1.14 Holidays, and one the client got slightly wrong
+
+Eid al-Fitr (4 days), Eid al-Adha (4 days), and unplanned road closures with no notice — the Jenin pattern, already covered by M-031.
+
+**Per-branch: Bethlehem closes 24–26 December, every year.** No other branch does.
+
+She wrote that this falls *"directly inside your review window"*. It does not, quite: the review is **Sunday 20 December** and the closure begins **four days after it**. It will not touch the figures she sees on the day.
+
+It *will* distort any Q4 or December comparison made in January, which is when block two lands — so it still has to be modelled, and it is still a good catch. Worth telling her precisely rather than accepting the framing: a date that is nearly right is exactly the kind of thing this project exists to pin down.
+
+### 1.15 M-035 — the retrospective, and why it is not a feature
+
+She asked for something outside the system: four years of her own quarterly review notes, re-examined against the hours, to find out **whether Ramallah's handicap ever changed a ranking she acted on.**
+
+> *"Not for the dashboard. For me."*
+
+| | |
+|---|---|
+| **Cost** | 1.0 day |
+| **Needs** | Her review notes, coming with the hours — and nothing else. Not the system, not the six weeks of files |
+| **When** | **Now, in the gap.** `SPEC.md` is blocked until Rania is interviewed, so this is the only real work available before Sunday. Done then, it costs block one nothing |
+
+**Two cautions for the written answer:**
+
+- **It answers whether a *decision* was wrong, not whether the *conversations* were fair.** Even if no ranking ever moved, a man spent four years being asked to explain a gap that was partly arithmetic. The analysis cannot settle that and must not be presented as if it does.
+- **Report the quarters that were within the handicap**, not only those where the order flipped. "Too close to call" is also an answer, and a more honest one than a binary.
+
+### 1.16 What this reply did *not* change
+
+Worth recording, because "no change" is a result too.
+
+Hours-based comparability replaces the day-based version already budgeted in **M-030** and the extended **M-022**, so the more precise model is **absorbed** — it consumes about 0.25 day of slack rather than adding to the total. **Block one stays at 26.0 days and 15 December.**
+
+Confirmed with no further work: phone view to January · Tulkarem not ingested · split delivery 5 and 15 December · hosting at ILS 91/month, budgeted at ILS 1,175 for the year · block two from 4 January.
+
 ---
 
 ## 2. Roles
@@ -268,6 +330,8 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 | `docs/discovery/CLIENT-UPDATE-002.md` | **Sent 8 Nov** — phone answer, the §1.5 error, the freeze, hosting, five things asked back |
 | `docs/discovery/CLIENT-REPLY-002.md` | **Received 9 Nov** — ILS not AED, the trading calendar, Tulkarem is hand-typed, block two from 4 Jan |
 | `docs/discovery/CLIENT-UPDATE-003.md` | **Sent 9 Nov** — shekel figures, the calendar cost, the Tulkarem decision, staged delivery, and the Ramallah finding |
+| `docs/discovery/CLIENT-REPLY-003.md` | **Received 11 Nov** — all eleven branches' hours, holidays, every outstanding decision approved, and a request for the retrospective |
+| `docs/discovery/CLIENT-UPDATE-004.md` | Drafted — the measured deficits, Jericho corrected, Bethlehem's date corrected, and what the retrospective can and cannot answer |
 | Rania's six weeks of real files | **Sunday** |
 
 ### Still open, and blocking `SPEC.md`
@@ -279,8 +343,9 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 | Rania's interview | NN: the client made it a condition. `RANIA-INTERVIEW.md` | §5 |
 | ~~Data residency~~ | ✅ **Answered 9 Nov: no rule.** Family business, no customer personal data in the exports | — |
 | ~~Hosted or office machine~~ | ✅ **Hosted, approved 9 Nov** at ≈ ILS 91/mo | — |
-| **Phone view in block one or block two?** The arithmetic she approved has changed: it now costs two of three testing days, not one of seven | Block one scope and the 15 Dec date | Update 003 |
-| **Eid and public holiday list** | M-032. She is supplying it | Update 003 |
+| ~~Phone view~~ | ✅ **January**, confirmed 11 Nov | — |
+| ~~Holiday list~~ | ✅ **Received 11 Nov** — Eid ×2, road closures, Bethlehem 24–26 Dec (§1.14) | — |
+| **Four years of quarterly review notes** | M-035. Rania is sending them with the hours. The only work available before Sunday | Update 003 |
 | Whether block two starts 21 Dec or 4 Jan | Scheduling only — needed by 4 December, not now | Update 002 |
 
 ---
@@ -408,6 +473,7 @@ She narrowed "mobile" to **one screen, read-only: branch totals for a date range
 | M-032 | Holiday calendar as data, applied globally | 0.25 |
 | M-033 | Timezone `Asia/Hebron`, branch-local day boundary in `domain/dates` | 0.25 |
 | M-034 | `unverified_source` — Tulkarem's hand-recorded months excluded from every comparison and ranking (§1.10) | 0.5 |
+| M-035 | **Retrospective** — four years of the client's review notes against the hours: did the handicap ever change a ranking she acted on? (§1.15) · *done in the gap before Sprint 1, not out of block one* | 1.0 |
 
 ### Sprint 4 — Seed, hardening, delivery · 4.5 days
 
@@ -590,7 +656,8 @@ Nothing is quietly absorbed. The client should always know what her request cost
 | 1 | ~~Decide between options A, B and C~~ | — | ✅ **Option C chosen** 8 Nov |
 | 2 | ~~Send `CLIENT-UPDATE-002.md`~~ | — | ✅ **Sent 8 Nov**, replied 9 Nov |
 | 2b | ~~Send `CLIENT-UPDATE-003.md`~~ | — | ✅ **Sent 9 Nov.** Waiting on: phone-view decision, opening hours, holiday list |
-| 2c | **Opening and closing hours per branch** | Suha | M-030, and measuring Ramallah's permanent deficit |
+| 2c | ~~Opening and closing hours~~ | — | ✅ **Received 11 Nov.** Four branches affected, not one (§1.13) |
+| 2d | **Run M-035** once the review notes arrive — before Sprint 1, in the gap | Amani | Nothing; it is free time |
 | 3 | ~~Confirm the hosting figure~~ | — | ✅ **Done and approved** — `ADR-0002`, ≈ **ILS 91/mo** (USD 28.80, rate 3.17). Quoted in AED first; the client's currency correction landed after |
 | 4 | ~~Get the trading calendar~~ | — | ✅ **Received 9 Nov** (§1.9). Opening *hours* still outstanding — see 2c |
 | 5 | ~~Get the Tulkarem file~~ | — | ✅ **Explained 9 Nov**: dead till, hand-typed Word, 3 months. Decision in §1.10 — not ingested in block one |
