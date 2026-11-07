@@ -167,7 +167,7 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 | `docs/discovery/IMPACT.md` | Written — five defaults changed, three of our assumptions corrected |
 | `docs/discovery/CLIENT-UPDATE-001.md` | Sent — timeline correction |
 | `docs/discovery/CLIENT-REPLY-001.md` | **Received** — Option 2 chosen, 20 December given |
-| `docs/discovery/CLIENT-UPDATE-002.md` | Drafted — phone answer, the §1.5 error, the freeze, two questions back |
+| `docs/discovery/CLIENT-UPDATE-002.md` | **Sent 8 Nov** — phone answer, the §1.5 error, the freeze, hosting at ≈ AED 106/mo, five things asked back |
 | Rania's six weeks of real files | **Sunday** |
 
 ### Still open, and blocking `SPEC.md`
@@ -456,7 +456,7 @@ Nothing is quietly absorbed. The client should always know what her request cost
 | # | Action | Owner | Blocks |
 |---|---|---|---|
 | 1 | ~~Decide between options A, B and C~~ | — | ✅ **Option C chosen** 8 Nov |
-| 2 | Send `CLIENT-UPDATE-002.md` | Amani | Items 3–6 |
+| 2 | ~~Send `CLIENT-UPDATE-002.md`~~ | — | ✅ **Sent 8 Nov.** Items 4–7 and 11 now wait on her reply |
 | 3 | ~~Confirm the hosting figure~~ | — | ✅ **Done** — `ADR-0002`, ≈ **AED 106/mo**. The "tens of dirhams" in update 001 was itself unchecked and is corrected |
 | 4 | Get the **trading calendar** — non-trading days per branch, week start, timezone | Suha | `domain/dates`, every comparison, `SPEC.md` |
 | 5 | Get the **Tulkarem file** Rania calls *"not really a file"* | Rania | Whether document parsing is in scope at all |
@@ -469,4 +469,4 @@ Nothing is quietly absorbed. The client should always know what her request cost
 
 **Not before then: not one line of application code.**
 
-**The schedule in §1.7 assumes work starts Monday 9 November.** Every working day that items 2–6 and 10 take is a day off the front of block one, and block one is already 3.75 days past four weeks. The 20 December date does not move, so this delay is spent out of Suha's seven testing days. **That is the thing to watch this week**, and if it reaches three days she hears about it immediately rather than at delivery.
+**The schedule in §1.7 assumes work starts Monday 9 November.** Every working day that items 4–7 and 10 take is a day off the front of block one, and block one is already 3.75 days past four weeks. The 20 December date does not move, so this delay is spent out of Suha's seven testing days. **That is the thing to watch this week**, and if it reaches three days she hears about it immediately rather than at delivery.
