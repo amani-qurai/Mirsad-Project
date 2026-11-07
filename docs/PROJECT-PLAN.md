@@ -267,6 +267,7 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 | `docs/discovery/CLIENT-REPLY-001.md` | **Received** — Option 2 chosen, 20 December given |
 | `docs/discovery/CLIENT-UPDATE-002.md` | **Sent 8 Nov** — phone answer, the §1.5 error, the freeze, hosting, five things asked back |
 | `docs/discovery/CLIENT-REPLY-002.md` | **Received 9 Nov** — ILS not AED, the trading calendar, Tulkarem is hand-typed, block two from 4 Jan |
+| `docs/discovery/CLIENT-UPDATE-003.md` | **Sent 9 Nov** — shekel figures, the calendar cost, the Tulkarem decision, staged delivery, and the Ramallah finding |
 | Rania's six weeks of real files | **Sunday** |
 
 ### Still open, and blocking `SPEC.md`
@@ -588,7 +589,7 @@ Nothing is quietly absorbed. The client should always know what her request cost
 |---|---|---|---|
 | 1 | ~~Decide between options A, B and C~~ | — | ✅ **Option C chosen** 8 Nov |
 | 2 | ~~Send `CLIENT-UPDATE-002.md`~~ | — | ✅ **Sent 8 Nov**, replied 9 Nov |
-| 2b | **Send `CLIENT-UPDATE-003.md`** | Amani | The phone-view decision, opening hours, holiday list |
+| 2b | ~~Send `CLIENT-UPDATE-003.md`~~ | — | ✅ **Sent 9 Nov.** Waiting on: phone-view decision, opening hours, holiday list |
 | 2c | **Opening and closing hours per branch** | Suha | M-030, and measuring Ramallah's permanent deficit |
 | 3 | ~~Confirm the hosting figure~~ | — | ✅ **Done and approved** — `ADR-0002`, ≈ **ILS 91/mo** (USD 28.80, rate 3.17). Quoted in AED first; the client's currency correction landed after |
 | 4 | ~~Get the trading calendar~~ | — | ✅ **Received 9 Nov** (§1.9). Opening *hours* still outstanding — see 2c |

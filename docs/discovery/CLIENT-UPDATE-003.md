@@ -5,7 +5,7 @@
 | **To** | Suha Qasem — Nakheel Retail |
 | **From** | Amani |
 | **Date** | 2026-11-09 |
-| **Status** | Ready to send |
+| **Status** | **Sent 9 November 2026**, via Imam |
 | **Needs** | One decision, and two things I am missing |
 
 ---
