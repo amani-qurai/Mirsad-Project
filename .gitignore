@@ -1,0 +1,71 @@
+# Mirsad — .gitignore
+#
+# Non-negotiable 11: the repository is public. No secrets, no .env files,
+# no real client data. The rules below are the mechanical half of that; the
+# review checklist is the other half.
+
+# ─── Secrets and configuration ────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets.*
+.secrets/
+
+# ─── Real client data ─────────────────────────────────────────────────────
+# Rania's six weeks of real exports must never be committed. Seed data is
+# synthetic and lives in the seed generator (M-024), not here.
+/data/
+/uploads/
+/client-files/
+*.xlsx
+*.xls
+*.csv
+!tests/**/fixtures/**/*.csv
+!tests/**/fixtures/**/*.xlsx
+!backend/**/fixtures/**/*.csv
+!backend/**/fixtures/**/*.xlsx
+
+# ─── Python ───────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+*.egg-info/
+
+# ─── Node / Next.js ───────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+.npm/
+.pnpm-store/
+
+# ─── Playwright ───────────────────────────────────────────────────────────
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# ─── Editors and OS ───────────────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ─── Local tooling ────────────────────────────────────────────────────────
+*.log
+.docker/
+docker-compose.override.yml

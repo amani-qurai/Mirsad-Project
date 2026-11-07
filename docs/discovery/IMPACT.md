@@ -214,7 +214,13 @@ The answers add about **five net days**.
 
 Acting on that prompted a re-estimate of every task rather than of phases, and it found a larger problem that the answers did not cause: **the original four-week figure was never sound.** Summed task by task, the work is ≈ 31 days after every available cut — about six weeks.
 
-The revised numbers, the three options, and the decision taken are in [`PROJECT-PLAN.md`](../PROJECT-PLAN.md) §1. The short version: four weeks is being held, the cut list is spent immediately, and four weeks therefore delivers the engine and a minimal dashboard rather than the full nine-point acceptance list.
+The revised numbers, the three options, and the decision taken are in [`PROJECT-PLAN.md`](../PROJECT-PLAN.md) §1.
+
+> **Superseded on 2026-11-08.** This section originally ended: *"four weeks is being held, the cut list is spent immediately, and four weeks therefore delivers the engine and a minimal dashboard rather than the full nine-point acceptance list."*
+>
+> That sentence was wrong, and the numbers to disprove it were in the same plan. Summed, the four-week list came to 26.5 days against 20 available. The client chose Option C, and the first block now lands **10 December** with its arithmetic shown — [`PROJECT-PLAN.md`](../PROJECT-PLAN.md) §1.5 for the error, §1.7 for the dates, §7.1 for what was reduced.
+>
+> The original wording is quoted rather than deleted, because a document recording our own mistakes should not quietly acquire a third version of them.
 
 One cut in the original list is no longer available. Comparison-period charts were item 2, and answers 7 and 9 are entirely about comparison fairness — cutting it would remove the thing that nearly cost the client a branch. A cut list written before the client answers is a guess.
 
