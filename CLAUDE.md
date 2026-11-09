@@ -20,17 +20,20 @@ Every decision gets measured against one question: **does this make the uncertai
 
 ## The gate
 
-No application code is written until `docs/SPEC.md` is approved. If you are asked to implement something that is not in an approved spec and does not have a task ID, stop and say so.
+Every piece of application code belongs to a task ID in `docs/PROJECT-PLAN.md` §7. If you are asked to implement something that has no task ID, stop and say so.
+
+The original gate — no code until `docs/SPEC.md` is approved — **was waived by the reviewer on 9 November 2026** (`docs/DECISIONS.md` D-001). There is no `SPEC.md`. Scope is the task list, the client's words, and the decisions log, read together.
 
 Read before you build:
 
 | Document | What it settles |
 |---|---|
+| `docs/DECISIONS.md` | Every decision taken since the client thread closed. **Where it disagrees with anything below, it wins** |
 | `docs/decisions/ADR-0001-technology-stack.md` | Stack, and the layering in §6 |
-| `docs/discovery/ANSWERS.md` | The client's own words. Where this disagrees with anything else, this wins |
+| `docs/discovery/ANSWERS.md` | The client's own words. Wins over everything except `DECISIONS.md` |
+| `docs/discovery/RANIA-MEETING.md` | What the weekly user needs, and what is wrong with each branch's file |
 | `docs/discovery/IMPACT.md` | What those answers changed, including where our earlier defaults were wrong |
-| `docs/PROJECT-PLAN.md` | Sprints, task IDs, Definition of Done |
-| `docs/SPEC.md` | Scope — including what is explicitly *not* built |
+| `docs/PROJECT-PLAN.md` | Sprints, task IDs, Definition of Done. Its dates are superseded by `DECISIONS.md` D-002 |
 
 The client is in **Palestine** and trades in **shekels (ILS)**, locales `ar-PS` and `en-PS`, timezone **Asia/Hebron**. The trading week runs **Saturday to Thursday; Friday is closed everywhere**.
 
@@ -127,6 +130,8 @@ Run the Definition of Done checklist in `docs/PROJECT-PLAN.md` §8. Check the sc
 Load the **`mirsad-conventions`** skill before touching Arabic text handling, error codes, rejection reasons, or any user-facing string. It holds the normalisation rule table, the error-code catalogue and the i18n checklist — the detail that is too long to live here.
 
 ### When something is unclear
-Ask. Do not invent an assumption and build on it.
+The client thread is closed, so there is no one to ask. **Decide, write the decision and the reason in `docs/DECISIONS.md`, and keep building.** Do not stop and wait.
 
-This project exists because someone built reports on data nobody checked. A guess buried in a function is the same failure in a different place. If a requirement is ambiguous, say what is ambiguous and what you would need in order to proceed — that is a useful answer, and it is exactly what we are asking the software itself to do.
+What is still forbidden is an assumption nobody can see. This project exists because someone built reports on data nobody checked; a guess buried in a function is the same failure in a different place. A decision in the log can be found, questioned and reversed in an hour. A guess in the code cannot.
+
+The software works the same way at runtime: when *it* cannot decide — an ambiguous date, a weak product match — it holds the row and says so. It does not decide on the user's behalf.

@@ -8,6 +8,8 @@
 | **Client** | Suha Qasem — Nakheel Retail (**Palestine**, trades in **ILS**; week Sat–Thu, Friday closed) |
 | **Repository** | `amani-qurai/Mirsad-Project` (public) |
 
+> **Superseded in part on 9 November 2026.** The client thread is closed and building has started without a `SPEC.md`. The dates in this plan (5 / 15 / 20 December) are replaced by **12 Dec (Rania) · 22 Dec (Suha) · review 27 Dec · block two from 4 Jan** — `DECISIONS.md` D-002. Tulkarem is now read and marked rather than left unread (D-003), and M-035 runs after block one (D-004). Task IDs, estimates, the cut list and the Definition of Done below still stand. **Where this plan and `DECISIONS.md` disagree, `DECISIONS.md` wins.**
+
 ---
 
 ## 1. Schedule — and a correction to my own estimate

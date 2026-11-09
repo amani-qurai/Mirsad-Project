@@ -23,6 +23,7 @@ secrets.*
 *.xlsx
 *.xls
 *.csv
+*.docx
 !tests/**/fixtures/**/*.csv
 !tests/**/fixtures/**/*.xlsx
 !backend/**/fixtures/**/*.csv
