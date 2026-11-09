@@ -29,6 +29,7 @@ from typing import Any
 from app.domain.dates import FileDates, Period, infer_dates
 from app.domain.matching import Catalogue
 from app.domain.numbers import parse_amount
+from app.domain.returns import convention, signed_amount
 from app.errors import SEVERITY, ErrorCode, Severity, worst
 from app.pipeline.headers import Field, HeaderMapping
 from app.pipeline.readers import RawRow, RawTable
@@ -57,7 +58,8 @@ class RowResult:
     scope: frozenset[Scope]
     date: dt.date | None = None  # set only when the date is certain or inferred, never guessed
     product: int | None = None  # set only when matched or newly created, never guessed
-    amount: Decimal | None = None  # as read; None when missing, unreadable or ambiguous
+    amount: Decimal | None = None  # signed: a refund is negative, however the till wrote it
+    is_return: bool = False
     quantity: Decimal | None = None
 
     @property
@@ -82,6 +84,7 @@ def _value(row: RawRow, mapping: HeaderMapping, f: Field) -> str | None:
 class TableCheck:
     rows: tuple[RowResult, ...]
     dates: FileDates
+    return_convention: str | None = None  # "negative", "rtn_note", "both", or None: no returns at all
 
 
 def check_rows(
@@ -99,6 +102,7 @@ def check_rows(
     findings: dict[int, list[Finding]] = {row.line: [] for row in table.rows}
     amounts: dict[int, Decimal] = {}
     quantities: dict[int, Decimal] = {}
+    returns: dict[int, str] = {}
 
     for row in table.rows:
         found = findings[row.line]
@@ -124,7 +128,14 @@ def check_rows(
             elif parsed.value is None:
                 found.append(Finding(ErrorCode.ROW_AMOUNT_UNPARSEABLE, {"value": raw_amount}))
             else:
-                amounts[row.line] = parsed.value
+                signed = signed_amount(parsed.value, _value(row, mapping, Field.NOTES))
+                amounts[row.line] = signed.amount
+                if signed.is_return:
+                    returns[row.line] = "rtn_note" if signed.flipped or parsed.value >= 0 else "negative"
+                if signed.flipped:
+                    found.append(Finding(ErrorCode.ROW_RETURN_SIGN_FLIPPED, {
+                        "value": raw_amount, "note": _value(row, mapping, Field.NOTES),
+                    }))
         raw_quantity = _value(row, mapping, Field.QUANTITY)
         if raw_quantity is not None:
             quantity = parse_amount(raw_quantity).value
@@ -163,9 +174,12 @@ def check_rows(
         when = result.value if result is not None else None
         results.append(RowResult(
             row.line, found, _scope(row, mapping, found), when, products.get(row.line),
-            amounts.get(row.line), quantities.get(row.line),
+            amounts.get(row.line), row.line in returns, quantities.get(row.line),
         ))
-    return TableCheck(tuple(results), dates)
+    by_kind = list(returns.values())
+    return TableCheck(
+        tuple(results), dates, convention(by_kind.count("negative"), by_kind.count("rtn_note")),
+    )
 
 
 def _check_repeated_ids(table: RawTable, mapping: HeaderMapping, findings: dict[int, list[Finding]]) -> None:

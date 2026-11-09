@@ -39,6 +39,8 @@ class ErrorCode(StrEnum):
     ROW_AMOUNT_UNPARSEABLE = "ROW_AMOUNT_UNPARSEABLE"
     ROW_AMOUNT_AMBIGUOUS = "ROW_AMOUNT_AMBIGUOUS"
     ROW_QUANTITY_UNPARSEABLE = "ROW_QUANTITY_UNPARSEABLE"
+    ROW_RETURN_SIGN_FLIPPED = "ROW_RETURN_SIGN_FLIPPED"
+    FILE_NO_RETURNS = "FILE_NO_RETURNS"
     # ── Transactions ────────────────────────────────────────────────────────
     TXN_ID_MISSING = "TXN_ID_MISSING"
     TXN_ID_REUSED = "TXN_ID_REUSED"
@@ -74,6 +76,10 @@ SEVERITY: dict[ErrorCode, Severity] = {
     # "1,500": one and a half, or fifteen hundred. A person decides (D-019).
     ErrorCode.ROW_AMOUNT_AMBIGUOUS: Severity.HELD,
     ErrorCode.ROW_QUANTITY_UNPARSEABLE: Severity.WARNING,
+    # A positive RTN row read as the refund it is. Recorded so the correction is visible.
+    ErrorCode.ROW_RETURN_SIGN_FLIPPED: Severity.WARNING,
+    # Many sales, not one refund: returns are probably recorded elsewhere, or not at all.
+    ErrorCode.FILE_NO_RETURNS: Severity.WARNING,
     ErrorCode.TXN_ID_MISSING: Severity.WARNING,
     # Same id, different sale: the till restarted its numbering. Not a duplicate (D-013).
     ErrorCode.TXN_ID_REUSED: Severity.WARNING,
