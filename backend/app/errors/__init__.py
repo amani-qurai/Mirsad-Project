@@ -46,6 +46,10 @@ class ErrorCode(StrEnum):
     DATE_FORMAT_AMBIGUOUS = "DATE_FORMAT_AMBIGUOUS"
     DATE_FORMAT_INFERRED = "DATE_FORMAT_INFERRED"
     FILE_DATE_FORMAT_CHANGED = "FILE_DATE_FORMAT_CHANGED"
+    # ── Products ────────────────────────────────────────────────────────────
+    PRODUCT_NEW = "PRODUCT_NEW"
+    PRODUCT_MATCH_UNCONFIRMED = "PRODUCT_MATCH_UNCONFIRMED"
+    PRODUCT_NAME_CONFLICT = "PRODUCT_NAME_CONFLICT"
 
 
 SEVERITY: dict[ErrorCode, Severity] = {
@@ -77,6 +81,12 @@ SEVERITY: dict[ErrorCode, Severity] = {
     # A branch's till changed how it writes dates. Loud by design: one
     # confirmation from a person releases the whole file.
     ErrorCode.FILE_DATE_FORMAT_CHANGED: Severity.HELD,
+    # Recorded as a new canonical product rather than forced into a near one.
+    ErrorCode.PRODUCT_NEW: Severity.WARNING,
+    # Block one has no fuzzy scores: a spelling nobody has confirmed, with a
+    # candidate product, waits for a person (D-018). Held from product figures only.
+    ErrorCode.PRODUCT_MATCH_UNCONFIRMED: Severity.HELD,
+    ErrorCode.PRODUCT_NAME_CONFLICT: Severity.HELD,
 }
 
 _RANK = {Severity.WARNING: 1, Severity.HELD: 2, Severity.REJECTED: 3}

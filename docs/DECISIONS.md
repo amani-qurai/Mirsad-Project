@@ -206,3 +206,32 @@ The rule table in `.claude/skills/mirsad-conventions/references/arabic-normalisa
 The rule table is updated with all three and their reasons. No existing rule was weakened.
 
 **Result:** 116 spellings → 96 comparison keys. Of the 20 merges, every one is the same product; **no key appears under two product codes.** The remaining 96 keys cover 25 products, mostly because Arabic and English names are never matched to each other — by design, that is a person's decision, made once.
+
+## D-018 — Block-one matching: known spellings match, everything else is new or a question
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-013 (reduced, per `PROJECT-PLAN.md` §7.1)
+
+No fuzzy scoring in block one. A spelling matches only if it is already known — exactly, or by its `domain/arabic` key. Otherwise:
+
+- **It has a candidate** (its product code belongs to a known product, or the same spelling is already waiting) → **held**, `PRODUCT_MATCH_UNCONFIRMED`, with the candidate as a one-click suggestion.
+- **It has no candidate at all** → **a new product**, `PRODUCT_NEW`. Visible and fixable; a wrong merge would not be.
+- **Its name and code point at different products** → **held**, `PRODUCT_NAME_CONFLICT`.
+
+**The code suggests; it never decides.** A name the catalogue does not know is never filed under a product because of its code (product code eras, M-012). **Lost characters** (Jenin's `?`, D-011) match only a spelling a person has confirmed, never by key, and never create a product.
+
+**One answer per spelling.** The resolve queue lists spellings, not rows; confirming one resolves every row with it, in every later file. A person's answer about a name/code pairing also accepts that pairing.
+
+**A product question does not remove a sale from its branch's total.** This changes how "held" works, and it is the important part of this entry. CLAUDE.md says held rows are "excluded, and counted out loud." Applied to the whole row, an unconfirmed spelling would remove about two thirds of week one's sales from the branch totals — the plausible wrong number Rania is most afraid of. So each held finding withholds the row only from the figures it affects:
+
+| Held because of | Withheld from |
+|---|---|
+| The date (ambiguous, out of the week) | everything |
+| The product (unconfirmed, conflict) | product and quantity figures; **still in the branch total** |
+
+The row is still counted out loud as held. Its completeness statement reads, for example, *"this branch's total includes 412 rows whose product is not yet confirmed."* The quantity scope now also requires the product scope, as the error-code reference always said.
+
+**Result on six weeks:** 25 products, one per code, none invented. **78 spellings** wait for a person, every one with a single suggestion, and every suggestion is correct on inspection. No conflicts. 22,585 rows count in branch totals; 7,816 in product figures before any answers. **Answering the 78 questions** — simulated by accepting each suggestion — **brings product figures to 21,829 rows and leaves 0 questions**, with still 25 products.
+
+**Revisit in block two:** Rania's 78 answers are the labelled data the fuzzy thresholds will be tuned against.
+
+**Display names** are the first spelling seen (`ELEC KETTLE 1.7L`, `Glass Jug 1,5 L`). They are defaults a person can rename; nothing depends on them.

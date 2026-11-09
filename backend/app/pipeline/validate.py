@@ -26,6 +26,7 @@ from enum import StrEnum
 from typing import Any
 
 from app.domain.dates import FileDates, Period, infer_dates
+from app.domain.matching import Catalogue
 from app.errors import SEVERITY, ErrorCode, Severity, worst
 from app.pipeline.headers import Field, HeaderMapping
 from app.pipeline.readers import RawRow, RawTable
@@ -53,6 +54,7 @@ class RowResult:
     findings: tuple[Finding, ...]
     scope: frozenset[Scope]
     date: dt.date | None = None  # set only when the date is certain or inferred, never guessed
+    product: int | None = None  # set only when matched or newly created, never guessed
 
     @property
     def severity(self) -> Severity | None:
@@ -78,8 +80,18 @@ class TableCheck:
     dates: FileDates
 
 
-def check_rows(table: RawTable, mapping: HeaderMapping, period: Period | None = None) -> TableCheck:
-    """Check every row. ``period`` is the week the file covers, if known (D-015)."""
+def check_rows(
+    table: RawTable,
+    mapping: HeaderMapping,
+    period: Period | None = None,
+    catalogue: Catalogue | None = None,
+) -> TableCheck:
+    """Check every row.
+
+    ``period`` is the week the file covers, if known (D-015). ``catalogue``
+    is the product catalogue to match against; it is updated as new products
+    are found, so files must be checked in the order they arrived.
+    """
     findings: dict[int, list[Finding]] = {row.line: [] for row in table.rows}
 
     for row in table.rows:
@@ -108,12 +120,23 @@ def check_rows(table: RawTable, mapping: HeaderMapping, period: Period | None = 
         if result is not None and result.code is not None:
             findings[row.line].append(Finding(result.code, result.context))
 
+    products: dict[int, int | None] = {}
+    if catalogue is not None:
+        for row in table.rows:
+            name = _value(row, mapping, Field.PRODUCT_NAME)
+            if name is None:
+                continue  # already ROW_MISSING_PRODUCT
+            match = catalogue.match(name, _value(row, mapping, Field.PRODUCT_CODE))
+            products[row.line] = match.product
+            if match.code is not None:
+                findings[row.line].append(Finding(match.code, match.context))
+
     results = []
     for row, result in zip(table.rows, dates.results):
         # Every finding carries its line, so a message can name it without a lookup.
         found = tuple(Finding(f.code, {**f.context, "line": row.line}) for f in findings[row.line])
         when = result.value if result is not None else None
-        results.append(RowResult(row.line, found, _scope(row, mapping, found), when))
+        results.append(RowResult(row.line, found, _scope(row, mapping, found), when, products.get(row.line)))
     return TableCheck(tuple(results), dates)
 
 
@@ -147,12 +170,25 @@ def _check_repeated_ids(table: RawTable, mapping: HeaderMapping, findings: dict[
                 findings[line].append(Finding(ErrorCode.TXN_ID_REUSED, {"txn_id": txn, "lines": distinct_lines}))
 
 
+# What a held finding withholds the row from (D-018). A question about the
+# date withholds it from everything; a question about the product only from
+# product figures — the sale still happened at that branch on that day.
+WITHHOLDS: dict[ErrorCode, Scope] = {
+    ErrorCode.DATE_FORMAT_AMBIGUOUS: Scope.TOTAL,
+    ErrorCode.ROW_DATE_OUT_OF_RANGE: Scope.TOTAL,
+    ErrorCode.PRODUCT_MATCH_UNCONFIRMED: Scope.PRODUCT,
+    ErrorCode.PRODUCT_NAME_CONFLICT: Scope.PRODUCT,
+}
+
+
 def _scope(row: RawRow, mapping: HeaderMapping, found: tuple[Finding, ...]) -> frozenset[Scope]:
-    if worst(f.severity for f in found) is Severity.REJECTED:
+    """Which figures this row may count towards. Each scope needs the one before it."""
+    withheld = {WITHHOLDS[f.code] for f in found if f.code in WITHHOLDS}
+    if worst(f.severity for f in found) is Severity.REJECTED or Scope.TOTAL in withheld:
         return frozenset()
     scope = {Scope.TOTAL}
-    if _value(row, mapping, Field.PRODUCT_NAME) is not None:
+    if _value(row, mapping, Field.PRODUCT_NAME) is not None and Scope.PRODUCT not in withheld:
         scope.add(Scope.PRODUCT)
-    if _value(row, mapping, Field.QUANTITY) is not None:
-        scope.add(Scope.QUANTITY)
+        if _value(row, mapping, Field.QUANTITY) is not None:
+            scope.add(Scope.QUANTITY)
     return frozenset(scope)

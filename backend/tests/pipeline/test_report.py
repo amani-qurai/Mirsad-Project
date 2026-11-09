@@ -138,7 +138,9 @@ def test_identical_files_in_one_batch_are_counted_once(tmp_path) -> None:
 def test_report_dict_holds_codes_and_numbers_only() -> None:
     report = report_file(csv("1,,0024,,2,698.28,", "2,29/09/2026,0024,دعاسة باب,2,10,"), "x.csv")
     d = report.to_dict()
-    assert d["rows"] == {"in": 2, "kept": 1, "rejected": 1, "held": 0, "warning": 0}
+    assert d["rows"] == {
+        "in": 2, "kept": 1, "rejected": 1, "held": 0, "warning": 0, "in_totals": 1, "in_product_figures": 1,
+    }
     assert d["codes"]["ROW_MISSING_DATE"] == {"severity": "rejected", "count": 1, "lines": [2]}
     assert d["codes"]["ROW_MISSING_PRODUCT"]["lines"] == [2]
     assert d["outside_scope"]["product"] == []  # line 2 is rejected, so it is not a completeness gap

@@ -18,6 +18,9 @@
     "ROW_DATE_OUT_OF_RANGE": "Line {line} is dated {date}, outside the week this file covers ({period_start} to {period_end}). Please confirm it.",
     "DATE_FORMAT_AMBIGUOUS": "Line {line}: {value} could be either of two dates. Choose the right one; we will not guess.",
     "DATE_FORMAT_INFERRED": "Line {line}: {value} could be read two ways. {evidence, select, week {Only one reading falls in the week this file covers, so we used it.} other {We read it the way the rest of this file is written.}}",
-    "FILE_DATE_FORMAT_CHANGED": "The way {file} writes dates has changed. Its rows are held until you confirm the new format once."
+    "FILE_DATE_FORMAT_CHANGED": "The way {file} writes dates has changed. Its rows are held until you confirm the new format once.",
+    "PRODUCT_NEW": "{name} did not match any product we know, so it was recorded as a new product. If it is one we already have, link it once.",
+    "PRODUCT_MATCH_UNCONFIRMED": "Line {line}: is {name} the same product as {candidates}? Answer once and every row with this spelling follows. Until then it counts in the branch total but not in product figures.",
+    "PRODUCT_NAME_CONFLICT": "Line {line}: the name {name} and the product code {product_code} point to different products. Choose which is right."
   }
 }
