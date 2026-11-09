@@ -4,6 +4,7 @@
     "FILE_ENCODING_UNDETECTED": "We could not tell which text encoding {file} uses. It was not read, rather than risk reading it wrongly.",
     "FILE_DELIMITER_UNDETECTED": "We could not tell how the columns in {file} are separated.",
     "FILE_TABLE_AMBIGUOUS": "{file} contains {count, plural, one {# table} other {# tables}}. Choose the one that holds the sales.",
-    "FILE_EMPTY": "{file} has no data rows."
+    "FILE_EMPTY": "{file} has no data rows.",
+    "FILE_HEADERS_UNRECOGNISED": "We do not recognise some of the columns in {file}. Tell us once what each one is, and we will remember it for this branch."
   }
 }

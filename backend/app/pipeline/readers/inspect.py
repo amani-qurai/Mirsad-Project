@@ -14,6 +14,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from app.errors import MirsadError
+from app.pipeline.headers import AmountBasis, map_headers
 
 from . import read_file
 
@@ -46,6 +47,14 @@ def main(folder: str) -> int:
             notes.append(f"{len(table.width_mismatch_lines)} rows not {len(table.header)} cells wide")
         if table.excel_date_cells:
             notes.append(f"{len(table.excel_date_cells)} real Excel date cells")
+        try:
+            mapping = map_headers(table)
+            fields = ", ".join(field.value for field in mapping.columns)
+            notes.append(f"columns → {fields}")
+            if mapping.amount_basis is not AmountBasis.UNSTATED:
+                notes.append(f"amounts are {mapping.amount_basis.value}")
+        except MirsadError as error:
+            notes.append(f"HELD {error.code.value} {error.context.get('unrecognised')} missing={error.context.get('missing')}")
         detail = " ".join(x for x in (s.detected_format, s.encoding, repr(s.delimiter) if s.delimiter else None) if x)
         print(f"{label}\n    {detail} · {len(table.rows)} rows · header {list(table.header)}")
         for note in notes:

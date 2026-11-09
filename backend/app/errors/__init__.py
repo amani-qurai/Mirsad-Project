@@ -28,6 +28,7 @@ class ErrorCode(StrEnum):
     FILE_DELIMITER_UNDETECTED = "FILE_DELIMITER_UNDETECTED"
     FILE_TABLE_AMBIGUOUS = "FILE_TABLE_AMBIGUOUS"
     FILE_EMPTY = "FILE_EMPTY"
+    FILE_HEADERS_UNRECOGNISED = "FILE_HEADERS_UNRECOGNISED"
 
 
 SEVERITY: dict[ErrorCode, Severity] = {
@@ -37,6 +38,8 @@ SEVERITY: dict[ErrorCode, Severity] = {
     # A person can say which sheet or table holds the sales, so it is held.
     ErrorCode.FILE_TABLE_AMBIGUOUS: Severity.HELD,
     ErrorCode.FILE_EMPTY: Severity.REJECTED,
+    # A person says once what the column is, and the answer is remembered.
+    ErrorCode.FILE_HEADERS_UNRECOGNISED: Severity.HELD,
 }
 
 
