@@ -262,3 +262,27 @@ Every amount in the six weeks is plain (`457.93`, `-570.65`, `647`). The parser 
 - **A file with 50 or more sales and no refunds at all** → `FILE_NO_RETURNS`, a warning: the figures stand, with the caveat that refunds may be recorded elsewhere or not at all.
 
 **Result on six weeks:** 98 `RTN` rows flipped (Jericho 52, Salfit 46). Branch totals fell by ILS 99,974.70, which is twice the refunds: read naively, they had been added as sales instead of subtracted. **All six Tulkarem files have no refunds** and are flagged; no other file is.
+
+## D-021 — Qalqilya's VAT waits for one decision; Jenin's discount is deducted and stated
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-017 (VAT and discount findings)
+
+**The evidence, from the real files.** Median unit price per product, against Nablus:
+
+| | Ratio | Reading |
+|---|---|---|
+| Qalqilya | **0.863** | = 1 ÷ 1.16. Pre-VAT, as the header `AMOUNT_EXVAT` says |
+| Jenin, rows with a discount, amount column | 0.998 | The amount is the **list price, before discount** |
+| Jenin, same rows, amount − discount | 0.896 | ~10% off, on 17% of rows |
+| Every other branch | 0.997–1.007 | Net of discount, VAT included |
+
+**Qalqilya — VAT.** Imam's letter: *"Do not silently apply the 1.16 … let it be a decision that is visible."* A file whose amounts are pre-VAT gets `FILE_AMOUNTS_EX_VAT`, **held**, with the suggested rate (16%, in `app/config.py`). Its money is shown as *held from totals*, not hidden and not multiplied. A person decides **once per branch**; from then on every file of that branch has VAT added and carries `FILE_VAT_ADDED` saying so. VAT is added to refunds too.
+
+**Jenin — discount.** Jenin's file has a discount column and an amount before discount; every other branch's amount already has the discount taken off. The deduction is not a correction of wrong data but reading the file's own columns correctly, so it is **applied, and stated on every file** (`FILE_DISCOUNT_DEDUCTED`, with the row count and the total). A refund of a discounted item gives back what was paid, so the discount reduces the refund's size too. An unreadable discount holds that row from totals.
+
+**Why VAT is held but discount is applied:** the discount is a figure the file itself provides. The VAT correction is a figure *we* would supply, about a branch the owner believes is consistent — and has been, only because of a correction made by hand. That is precisely the decision she should see being made.
+
+**Result on six weeks:**
+- **No VAT decision:** all six Qalqilya files held — ILS 612,000 visible as held from totals. Branch totals ILS 8,933,974.44.
+- **After `add_vat("qalqilya")`:** Qalqilya ILS 710,256.96 with VAT; one file held (Ramallah week 4). Branch totals **ILS 9,644,231.40**.
+- **Jenin:** discount deducted on 404 rows (392 sales, 12 refunds), ILS 18,000-plus in total, stated per file.
