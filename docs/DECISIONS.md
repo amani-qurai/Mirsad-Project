@@ -126,3 +126,36 @@ Each branch's column names map to eight standard fields: transaction id, date, p
 **Result on the real files:** all 67 branch files map completely. The six Qalqilya files are marked pre-VAT. The review-notes workbook is held, correctly, because it is not a branch export.
 
 **Revisit if:** a till changes its export headers. That arrives as a held file with the unknown column named, which is the intended behaviour.
+
+## D-013 — A repeated transaction id is a duplicate only when the whole row repeats
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-009
+
+The error catalogue said *same transaction id twice in one file → rejected*. The real files say otherwise: **Ramallah has 102 ids that appear more than once inside the same weekly file, and in every case the rows are different sales** — different product, date and amount. The till restarted its numbering. Applying the catalogue rule would have deleted 110 real Ramallah sales, at the branch whose figures matter most at the review.
+
+- **Same id, every cell identical** → `TXN_DUPLICATE_WITHIN_FILE`, rejected, pointing at the line it copies. None exist in the six weeks; the rule stays because a re-sent line is a real possibility.
+- **Same id, different content** → `TXN_ID_REUSED`, a **warning** on every row involved. All are kept and counted. The row is identified by its content, not its id.
+
+This updates the design intent in `.claude/skills/mirsad-conventions/references/error-codes.md`. Repeats *across* weeks for the same branch (Salfit and Ramallah both restarted at 1) are M-010's job.
+
+## D-014 — The first rejection report checks presence only
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-009
+
+The report runs before any cleaning, so it judges only whether a value is **there**, not whether it is **valid**. Whitespace counts as empty.
+
+| Missing | Outcome | Why |
+|---|---|---|
+| Date | rejected | Cannot be placed in a week |
+| Amount | rejected | Nothing to count |
+| Product name | warning, scope `{total}` | Counted in the branch total, left out of product figures. A code without a name is still missing: codes never identify a product alone (M-012) |
+| Quantity | warning | Amount still counts; left out of quantity figures |
+| Transaction id (column present, cell empty) | warning | Kept, identified by content |
+
+A file with **no** id column at all — Tulkarem — gets one file-level fact (`fields_absent`), not a warning on every row.
+
+Parsing dates and amounts adds its own findings later (M-005, M-006). Amounts are therefore **not totalled** in this report yet: summing text would mean parsing it here, outside `domain/numbers`.
+
+**In a batch, the first of two byte-identical files is kept** and the second is `FILE_EXACT_DUPLICATE`. Files are taken in name order, so of the Jenin week-03 pair, `…-FINAL.csv` is the one kept. The rows are identical, so the totals do not depend on which.
+
+**Result on six weeks:** 23,233 rows in · 23,080 kept · 153 rejected (86 no date, 67 no amount) · 774 outside product figures · 212 Ramallah rows with reused ids, all kept · 0 held (nothing in this stage can be held; dates and matching will add them).

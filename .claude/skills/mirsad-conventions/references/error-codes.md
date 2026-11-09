@@ -108,7 +108,8 @@ Initial set. The authoritative list is the enum in `backend/app/errors/`; this t
 
 | Code | Severity | Meaning |
 |---|---|---|
-| `TXN_DUPLICATE_WITHIN_FILE` | `rejected` | Same transaction id twice in one file |
+| `TXN_DUPLICATE_WITHIN_FILE` | `rejected` | Same transaction id **and every cell identical** in one file — the same line exported twice |
+| `TXN_ID_REUSED` | `warning` | Same id on **different** sales in one file — the till restarted its numbering (Ramallah). All rows kept. See `docs/DECISIONS.md` D-013 |
 | `TXN_DUPLICATE_IN_BRANCH` | `held` | Id already seen for this branch — the till update made ids non-unique, so this needs a human |
 | `TXN_ID_MISSING` | `warning` | No id; row kept, identified by its content |
 
