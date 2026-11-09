@@ -159,3 +159,36 @@ Parsing dates and amounts adds its own findings later (M-005, M-006). Amounts ar
 **In a batch, the first of two byte-identical files is kept** and the second is `FILE_EXACT_DUPLICATE`. Files are taken in name order, so of the Jenin week-03 pair, `…-FINAL.csv` is the one kept. The rows are identical, so the totals do not depend on which.
 
 **Result on six weeks:** 23,233 rows in · 23,080 kept · 153 rejected (86 no date, 67 no amount) · 774 outside product figures · 212 Ramallah rows with reused ids, all kept · 0 held (nothing in this stage can be held; dates and matching will add them).
+
+## D-015 — How day/month order is decided, and the file name's part in it
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-006
+
+A value like `10/03/2026` is decided once per file, from evidence, in this order:
+
+1. **The value itself.** `30/09/2026` has one valid reading; `10/10/2026` reads the same both ways.
+2. **The rest of the file.** If every value that *can* only be read one way agrees, the ambiguous ones follow it. `DATE_FORMAT_INFERRED`, warning, evidence `file`.
+3. **The week the file covers**, taken from its name (`<branch>-<YYYY-MM-DD>…`, the date being the week's first day). Only one reading of `10/04/2026` falls in 4–10 October. Evidence `week`.
+4. **Otherwise held**: `DATE_FORMAT_AMBIGUOUS`, with both candidate dates.
+
+If the file and the week point different ways for a value, that value is **held**, not chosen.
+
+**Why the week is needed:** 4–10 October has no day above 12, so the week-02 files of every branch carry no evidence of their own. Without step 3, about 2,000 rows a year in weeks like that would sit in the held queue for a decision the week already answers.
+
+**Why the name is acceptable evidence:** it is used *only* to choose between two readings the value already allows. It never moves a date, and a date outside the week is held (`ROW_DATE_OUT_OF_RANGE`), not corrected. A file whose name does not follow the pattern is still read; its ambiguous dates are held.
+
+**Two-digit years** (Salfit, `28/09/26`) are read as 20yy. A year-first reading of a two-digit value is not considered: no till writes one, and the week check would catch it.
+
+**Result on six weeks:** every date in every file falls inside its own week. Nothing unparseable, nothing out of range, nothing ambiguous left over.
+
+## D-016 — A change in a branch's date format holds the file
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-006
+
+Imam's letter asks for *"a loud failure when a branch's format changes."* When a branch's file is read in a different day/month order from its previous file — or a single file contains both orders — the file gets `FILE_DATE_FORMAT_CHANGED`, **held**. Every usable row in it waits for one confirmation; the rows are not rejected and nothing is re-read.
+
+Held rather than a warning because the risk is exactly the one this project exists for: in the week a till switches, an ambiguous date read the old way is a plausible wrong number. One click from Rania is cheap; a silently mis-dated week is not.
+
+**Result on six weeks:** Ramallah reads month-first in weeks 1–3 and day-first from week 4, matching the closing letter. Week 4 (18 Oct, 495 rows) is held. No other branch changes.
+
+**Known noise, kept on purpose:** 8,236 rows carry `DATE_FORMAT_INFERRED`, so "rows with warnings" is dominated by it and the 774 missing-product rows are harder to see. The per-row code stays because drill-down must show how each date was read. **Revisit in M-017**: the data quality screen should state the inference once per file and list the rows behind it, rather than count it beside warnings that need attention.

@@ -20,10 +20,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from app.domain.dates import Order
 from app.errors import SEVERITY, ErrorCode, MirsadError, Severity
+from app.pipeline.filenames import parse_file_name
 from app.pipeline.headers import AmountBasis, Field, map_headers
 from app.pipeline.readers import read_bytes
-from app.pipeline.validate import RowResult, Scope, check_rows
+from app.pipeline.validate import Finding, RowResult, Scope, check_rows
 
 
 @dataclass(frozen=True)
@@ -38,7 +40,18 @@ class FileReport:
     extension_mismatch: bool = False
     amount_basis: AmountBasis | None = None
     fields_absent: tuple[Field, ...] = ()  # columns this file does not have at all
+    branch: str | None = None  # from the file name, when it follows the pattern
+    week_start: str | None = None
+    date_order: Order | None = None
+    date_order_evidence: str | None = None  # "file" or "week"
+    # File-level findings that do not stop the rows being read, e.g. a change
+    # in date format. A held one holds every kept row in the file.
+    file_findings: tuple[Finding, ...] = ()
     rows: tuple[RowResult, ...] = ()
+
+    @property
+    def held_file(self) -> bool:
+        return any(f.severity is Severity.HELD for f in self.file_findings)
 
     @property
     def rows_in(self) -> int:
@@ -54,10 +67,14 @@ class FileReport:
 
     @property
     def rows_held(self) -> int:
+        if self.held_file:
+            return self.rows_kept  # every usable row waits for the one file-level answer
         return sum(r.severity is Severity.HELD for r in self.rows)
 
     @property
     def rows_with_warnings(self) -> int:
+        if self.held_file:
+            return 0
         return sum(r.severity is Severity.WARNING for r in self.rows)
 
     def lines_by_code(self) -> dict[ErrorCode, list[int]]:
@@ -82,6 +99,13 @@ class FileReport:
             "extension_mismatch": self.extension_mismatch,
             "amount_basis": self.amount_basis.value if self.amount_basis else None,
             "fields_absent": [f.value for f in self.fields_absent],
+            "branch": self.branch,
+            "week_start": self.week_start,
+            "date_order": self.date_order.value if self.date_order else None,
+            "date_order_evidence": self.date_order_evidence,
+            "file_findings": [
+                {"code": f.code.value, "severity": f.severity.value, "context": f.context} for f in self.file_findings
+            ],
             "rows": {
                 "in": self.rows_in,
                 "kept": self.rows_kept,
@@ -111,6 +135,7 @@ class BatchReport:
             "files": len(self.files),
             "files_read": len(read),
             "files_refused": len(self.files) - len(read),
+            "files_held": sum(f.held_file for f in read),
             "rows_in": sum(f.rows_in for f in read),
             "rows_kept": sum(f.rows_kept for f in read),
             "rows_rejected": sum(f.rows_rejected for f in read),
@@ -125,6 +150,8 @@ class BatchReport:
                 counts[code] += len(lines)
             if f.file_code is not None:
                 counts[f.file_code] += 1
+            for finding in f.file_findings:
+                counts[finding.code] += 1
         return counts
 
     def to_dict(self) -> dict[str, Any]:
@@ -135,8 +162,17 @@ class BatchReport:
         }
 
 
-def report_file(data: bytes, name: str, seen: dict[str, str] | None = None) -> FileReport:
-    """Read, map and check one file. ``seen`` maps sha256 → name for this batch."""
+def report_file(
+    data: bytes,
+    name: str,
+    seen: dict[str, str] | None = None,
+    date_orders: dict[str, Order] | None = None,
+) -> FileReport:
+    """Read, map and check one file.
+
+    ``seen`` maps sha256 → name for this batch. ``date_orders`` maps branch →
+    the date order of its last file; it is read to detect a change and updated.
+    """
     digest = hashlib.sha256(data).hexdigest()
     if seen is not None:
         if digest in seen:
@@ -149,6 +185,26 @@ def report_file(data: bytes, name: str, seen: dict[str, str] | None = None) -> F
     except MirsadError as error:
         return FileReport(name, digest, error.code, error.context)
 
+    parsed = parse_file_name(name)
+    check = check_rows(table, mapping, parsed.period if parsed else None)
+    order = check.dates.order
+    file_findings: list[Finding] = []
+
+    if check.dates.conflicting:
+        # Values only readable as day/month and values only readable as
+        # month/day in one file: the till changed format mid-file.
+        file_findings.append(Finding(ErrorCode.FILE_DATE_FORMAT_CHANGED, {"file": name, "within_file": True}))
+    elif parsed is not None and date_orders is not None and order is not None:
+        previous = date_orders.get(parsed.branch)
+        if previous is not None and previous is not order:
+            file_findings.append(
+                Finding(
+                    ErrorCode.FILE_DATE_FORMAT_CHANGED,
+                    {"file": name, "branch": parsed.branch, "previous": previous.value, "current": order.value},
+                )
+            )
+        date_orders[parsed.branch] = order
+
     return FileReport(
         name=name,
         sha256=digest,
@@ -156,14 +212,22 @@ def report_file(data: bytes, name: str, seen: dict[str, str] | None = None) -> F
         extension_mismatch=table.source.extension_mismatch,
         amount_basis=mapping.amount_basis,
         fields_absent=tuple(f for f in Field if not mapping.has(f)),
-        rows=check_rows(table, mapping),
+        branch=parsed.branch if parsed else None,
+        week_start=parsed.week_start.isoformat() if parsed else None,
+        date_order=order,
+        date_order_evidence=check.dates.order_evidence,
+        file_findings=tuple(file_findings),
+        rows=check.rows,
     )
 
 
 def report_batch(paths: list[Path]) -> BatchReport:
-    """One batch, in the order given. The first of two identical files is the one kept."""
+    """One batch, in the order given — oldest week first, so a change in a
+    branch's date format is caught in the file where it happens. The first of
+    two identical files is the one kept."""
     seen: dict[str, str] = {}
-    return BatchReport(tuple(report_file(p.read_bytes(), p.name, seen) for p in paths))
+    orders: dict[str, Order] = {}
+    return BatchReport(tuple(report_file(p.read_bytes(), p.name, seen, orders) for p in paths))
 
 
 def render_text(report: BatchReport) -> str:
@@ -179,17 +243,21 @@ def render_text(report: BatchReport) -> str:
             flags.append(f"is {f.detected_format}")
         if f.amount_basis is AmountBasis.EX_VAT:
             flags.append("PRE-VAT")
+        if f.date_order is not None:
+            flags.append(f"dates {f.date_order.value}" + (" (by week)" if f.date_order_evidence == "week" else ""))
+        for finding in f.file_findings:
+            flags.append(f"{finding.severity.value.upper()} {finding.code.value} {finding.context.get('previous', '')}→{finding.context.get('current', '')}")
         flag = f" [{', '.join(flags)}]" if flags else ""
         out.append(
             f"{f.name:<38} in {f.rows_in:>4} · kept {f.rows_kept:>4} · rejected {f.rows_rejected:>2}"
-            f" · no product {len(f.lines_outside(Scope.PRODUCT)):>3}{flag}"
+            f" · held {f.rows_held:>3} · no product {len(f.lines_outside(Scope.PRODUCT)):>3}{flag}"
         )
         if codes:
             out.append(f"{'':<38} {codes}")
     t = report.totals()
     out.append("")
     out.append(
-        f"{t['files']} files ({t['files_refused']} refused) · {t['rows_in']} rows in · {t['rows_kept']} kept · "
+        f"{t['files']} files ({t['files_refused']} refused, {t['files_held']} held) · {t['rows_in']} rows in · {t['rows_kept']} kept · "
         f"{t['rows_rejected']} rejected · {t['rows_held']} held · {t['rows_with_warnings']} with warnings"
     )
     for code, n in report.code_counts().most_common():

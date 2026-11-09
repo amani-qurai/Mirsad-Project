@@ -13,6 +13,11 @@
     "ROW_MISSING_QUANTITY": "Line {line} has no quantity. Its amount is counted; it is left out of quantity figures.",
     "TXN_ID_MISSING": "Line {line} has no transaction number. The row is kept and identified by its contents.",
     "TXN_ID_REUSED": "Transaction number {txn_id} is used for different sales on lines {lines}. This usually means the till restarted its numbering. All of them are kept.",
-    "TXN_DUPLICATE_WITHIN_FILE": "Line {line} is an exact copy of line {same_as_line}, so it was not counted twice."
+    "TXN_DUPLICATE_WITHIN_FILE": "Line {line} is an exact copy of line {same_as_line}, so it was not counted twice.",
+    "ROW_DATE_UNPARSEABLE": "Line {line} has a date we cannot read: {value}.",
+    "ROW_DATE_OUT_OF_RANGE": "Line {line} is dated {date}, outside the week this file covers ({period_start} to {period_end}). Please confirm it.",
+    "DATE_FORMAT_AMBIGUOUS": "Line {line}: {value} could be either of two dates. Choose the right one; we will not guess.",
+    "DATE_FORMAT_INFERRED": "Line {line}: {value} could be read two ways. {evidence, select, week {Only one reading falls in the week this file covers, so we used it.} other {We read it the way the rest of this file is written.}}",
+    "FILE_DATE_FORMAT_CHANGED": "The way {file} writes dates has changed. Its rows are held until you confirm the new format once."
   }
 }

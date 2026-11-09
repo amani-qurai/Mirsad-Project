@@ -40,6 +40,12 @@ class ErrorCode(StrEnum):
     TXN_ID_MISSING = "TXN_ID_MISSING"
     TXN_ID_REUSED = "TXN_ID_REUSED"
     TXN_DUPLICATE_WITHIN_FILE = "TXN_DUPLICATE_WITHIN_FILE"
+    # ── Dates ───────────────────────────────────────────────────────────────
+    ROW_DATE_UNPARSEABLE = "ROW_DATE_UNPARSEABLE"
+    ROW_DATE_OUT_OF_RANGE = "ROW_DATE_OUT_OF_RANGE"
+    DATE_FORMAT_AMBIGUOUS = "DATE_FORMAT_AMBIGUOUS"
+    DATE_FORMAT_INFERRED = "DATE_FORMAT_INFERRED"
+    FILE_DATE_FORMAT_CHANGED = "FILE_DATE_FORMAT_CHANGED"
 
 
 SEVERITY: dict[ErrorCode, Severity] = {
@@ -62,6 +68,15 @@ SEVERITY: dict[ErrorCode, Severity] = {
     ErrorCode.TXN_ID_REUSED: Severity.WARNING,
     # Same id and every cell identical: the same line exported twice.
     ErrorCode.TXN_DUPLICATE_WITHIN_FILE: Severity.REJECTED,
+    ErrorCode.ROW_DATE_UNPARSEABLE: Severity.REJECTED,
+    # Parses, but not inside the week the file covers: a person decides.
+    ErrorCode.ROW_DATE_OUT_OF_RANGE: Severity.HELD,
+    # Day/month order undecidable. Never guessed (AC-6).
+    ErrorCode.DATE_FORMAT_AMBIGUOUS: Severity.HELD,
+    ErrorCode.DATE_FORMAT_INFERRED: Severity.WARNING,
+    # A branch's till changed how it writes dates. Loud by design: one
+    # confirmation from a person releases the whole file.
+    ErrorCode.FILE_DATE_FORMAT_CHANGED: Severity.HELD,
 }
 
 _RANK = {Severity.WARNING: 1, Severity.HELD: 2, Severity.REJECTED: 3}
