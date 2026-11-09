@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import sys
+from decimal import Decimal
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -85,6 +86,27 @@ class FileReport:
             return 0
         return sum(Scope.PRODUCT in r.scope for r in self.rows)
 
+    def worth(self) -> dict[str, Decimal]:
+        """Amounts beside the counts — the completeness statement in money.
+
+        ``in_totals`` is what the branch total may use today. Every other line
+        is money that came in and is *not* in a figure yet, and why.
+        """
+        zero = Decimal(0)
+        out = {k: zero for k in ("in_totals", "rejected", "held_from_totals", "outside_product_figures")}
+        for r in self.rows:
+            if r.amount is None:
+                continue
+            if not r.kept:
+                out["rejected"] += r.amount
+            elif self.held_file or Scope.TOTAL not in r.scope:
+                out["held_from_totals"] += r.amount
+            else:
+                out["in_totals"] += r.amount
+                if Scope.PRODUCT not in r.scope:
+                    out["outside_product_figures"] += r.amount
+        return out
+
     @property
     def rows_with_warnings(self) -> int:
         if self.held_file:
@@ -134,6 +156,8 @@ class FileReport:
                 for code, lines in self.lines_by_code().items()
             },
             "outside_scope": {scope.value: self.lines_outside(scope) for scope in (Scope.PRODUCT, Scope.QUANTITY)},
+            # Decimal as text: JSON numbers are floats, and money is not.
+            "worth": {k: str(v) for k, v in self.worth().items()},
         }
 
 
@@ -179,6 +203,13 @@ class BatchReport:
             "rows_in_product_figures": sum(f.rows_in_product_figures for f in read),
         }
 
+    def worth(self) -> dict[str, Decimal]:
+        total: dict[str, Decimal] = {}
+        for f in self.files:
+            for k, v in f.worth().items():
+                total[k] = total.get(k, Decimal(0)) + v
+        return total
+
     def code_counts(self) -> Counter[ErrorCode]:
         counts: Counter[ErrorCode] = Counter()
         for f in self.files:
@@ -193,6 +224,7 @@ class BatchReport:
     def to_dict(self) -> dict[str, Any]:
         return {
             "totals": self.totals(),
+            "worth": {k: str(v) for k, v in self.worth().items()},
             "codes": {code.value: n for code, n in self.code_counts().most_common()},
             "products": len(self.catalogue.products) if self.catalogue else None,
             "questions": self.questions(),
@@ -291,7 +323,7 @@ def render_text(report: BatchReport) -> str:
         flag = f" [{', '.join(flags)}]" if flags else ""
         out.append(
             f"{f.name:<38} in {f.rows_in:>4} · kept {f.rows_kept:>4} · rejected {f.rows_rejected:>2}"
-            f" · held {f.rows_held:>3} · no product {len(f.lines_outside(Scope.PRODUCT)):>3}{flag}"
+            f" · held {f.rows_held:>3} · in totals {f.worth()['in_totals']:>11,.2f}{flag}"
         )
         if codes:
             out.append(f"{'':<38} {codes}")
@@ -302,6 +334,11 @@ def render_text(report: BatchReport) -> str:
         f"{t['rows_rejected']} rejected · {t['rows_held']} held · {t['rows_with_warnings']} with warnings"
     )
     out.append(f"  counted in branch totals: {t['rows_in_totals']} · in product figures: {t['rows_in_product_figures']}")
+    w = report.worth()
+    out.append(
+        f"  worth (ILS): in totals {w['in_totals']:,.2f} · held from totals {w['held_from_totals']:,.2f}"
+        f" · rejected {w['rejected']:,.2f} · in totals but outside product figures {w['outside_product_figures']:,.2f}"
+    )
     for code, n in report.code_counts().most_common():
         out.append(f"  {code.value:<28} {SEVERITY[code].value:<9} {n}")
     if report.catalogue is not None:

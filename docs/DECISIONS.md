@@ -235,3 +235,18 @@ The row is still counted out loud as held. Its completeness statement reads, for
 **Revisit in block two:** Rania's 78 answers are the labelled data the fuzzy thresholds will be tuned against.
 
 **Display names** are the first spelling seen (`ELEC KETTLE 1.7L`, `Glass Jug 1,5 L`). They are defaults a person can rename; nothing depends on them.
+
+## D-019 — Amounts: Decimal, read with certainty or held
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-005
+
+Every amount in the six weeks is plain (`457.93`, `-570.65`, `647`). The parser still reads what a till or a typed sheet can produce — Arabic-Indic digits, `٫` and `٬`, `1,234.50` and `1.234,50`, a currency word or `₪` at either end, a minus sign, a trailing minus, accounting brackets — because a format change arrives without notice.
+
+- **A lone comma before exactly three digits (`1,500`) is ambiguous**: one and a half, or fifteen hundred. `ROW_AMOUNT_AMBIGUOUS`, **held** from totals with both candidates. Never guessed.
+- **Anything else unreadable** → `ROW_AMOUNT_UNPARSEABLE`, rejected, with the value.
+- **An unreadable quantity** is a warning; the amount still counts, the row leaves quantity figures.
+- **Money is `Decimal`**, and is written to JSON as text, never as a float.
+
+**Every count in the report now has its worth beside it**: in totals, held from totals, rejected, and in totals but outside product figures. *"This branch's total includes 34 rows with no product, worth ILS 2,100"* can now be written from the report.
+
+**Result on six weeks:** nothing unreadable or ambiguous. ILS 9,663,356.01 in branch totals before returns and VAT are handled; ILS 205,860.42 held from totals (Ramallah week 4); ILS 38,336.11 in rejected rows.

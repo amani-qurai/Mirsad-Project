@@ -21,12 +21,14 @@ from __future__ import annotations
 
 import datetime as dt
 from collections import defaultdict
+from decimal import Decimal
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
 from app.domain.dates import FileDates, Period, infer_dates
 from app.domain.matching import Catalogue
+from app.domain.numbers import parse_amount
 from app.errors import SEVERITY, ErrorCode, Severity, worst
 from app.pipeline.headers import Field, HeaderMapping
 from app.pipeline.readers import RawRow, RawTable
@@ -55,6 +57,8 @@ class RowResult:
     scope: frozenset[Scope]
     date: dt.date | None = None  # set only when the date is certain or inferred, never guessed
     product: int | None = None  # set only when matched or newly created, never guessed
+    amount: Decimal | None = None  # as read; None when missing, unreadable or ambiguous
+    quantity: Decimal | None = None
 
     @property
     def severity(self) -> Severity | None:
@@ -93,6 +97,8 @@ def check_rows(
     are found, so files must be checked in the order they arrived.
     """
     findings: dict[int, list[Finding]] = {row.line: [] for row in table.rows}
+    amounts: dict[int, Decimal] = {}
+    quantities: dict[int, Decimal] = {}
 
     for row in table.rows:
         found = findings[row.line]
@@ -107,6 +113,25 @@ def check_rows(
             found.append(Finding(ErrorCode.ROW_MISSING_PRODUCT, {"product_code": code}))
         if mapping.has(Field.QUANTITY) and _value(row, mapping, Field.QUANTITY) is None:
             found.append(Finding(ErrorCode.ROW_MISSING_QUANTITY))
+
+        raw_amount = _value(row, mapping, Field.AMOUNT)
+        if raw_amount is not None:
+            parsed = parse_amount(raw_amount)
+            if parsed.ambiguous:
+                found.append(Finding(ErrorCode.ROW_AMOUNT_AMBIGUOUS, {
+                    "value": raw_amount, "candidates": [str(c) for c in parsed.candidates],
+                }))
+            elif parsed.value is None:
+                found.append(Finding(ErrorCode.ROW_AMOUNT_UNPARSEABLE, {"value": raw_amount}))
+            else:
+                amounts[row.line] = parsed.value
+        raw_quantity = _value(row, mapping, Field.QUANTITY)
+        if raw_quantity is not None:
+            quantity = parse_amount(raw_quantity).value
+            if quantity is None:
+                found.append(Finding(ErrorCode.ROW_QUANTITY_UNPARSEABLE, {"value": raw_quantity}))
+            else:
+                quantities[row.line] = quantity
         if mapping.has(Field.TXN_ID) and _value(row, mapping, Field.TXN_ID) is None:
             found.append(Finding(ErrorCode.TXN_ID_MISSING))
 
@@ -136,7 +161,10 @@ def check_rows(
         # Every finding carries its line, so a message can name it without a lookup.
         found = tuple(Finding(f.code, {**f.context, "line": row.line}) for f in findings[row.line])
         when = result.value if result is not None else None
-        results.append(RowResult(row.line, found, _scope(row, mapping, found), when, products.get(row.line)))
+        results.append(RowResult(
+            row.line, found, _scope(row, mapping, found), when, products.get(row.line),
+            amounts.get(row.line), quantities.get(row.line),
+        ))
     return TableCheck(tuple(results), dates)
 
 
@@ -176,6 +204,8 @@ def _check_repeated_ids(table: RawTable, mapping: HeaderMapping, findings: dict[
 WITHHOLDS: dict[ErrorCode, Scope] = {
     ErrorCode.DATE_FORMAT_AMBIGUOUS: Scope.TOTAL,
     ErrorCode.ROW_DATE_OUT_OF_RANGE: Scope.TOTAL,
+    ErrorCode.ROW_AMOUNT_AMBIGUOUS: Scope.TOTAL,
+    ErrorCode.ROW_QUANTITY_UNPARSEABLE: Scope.QUANTITY,
     ErrorCode.PRODUCT_MATCH_UNCONFIRMED: Scope.PRODUCT,
     ErrorCode.PRODUCT_NAME_CONFLICT: Scope.PRODUCT,
 }
@@ -189,6 +219,6 @@ def _scope(row: RawRow, mapping: HeaderMapping, found: tuple[Finding, ...]) -> f
     scope = {Scope.TOTAL}
     if _value(row, mapping, Field.PRODUCT_NAME) is not None and Scope.PRODUCT not in withheld:
         scope.add(Scope.PRODUCT)
-        if _value(row, mapping, Field.QUANTITY) is not None:
+        if _value(row, mapping, Field.QUANTITY) is not None and Scope.QUANTITY not in withheld:
             scope.add(Scope.QUANTITY)
     return frozenset(scope)

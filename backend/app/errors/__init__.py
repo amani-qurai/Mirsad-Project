@@ -36,6 +36,9 @@ class ErrorCode(StrEnum):
     ROW_MISSING_AMOUNT = "ROW_MISSING_AMOUNT"
     ROW_MISSING_PRODUCT = "ROW_MISSING_PRODUCT"
     ROW_MISSING_QUANTITY = "ROW_MISSING_QUANTITY"
+    ROW_AMOUNT_UNPARSEABLE = "ROW_AMOUNT_UNPARSEABLE"
+    ROW_AMOUNT_AMBIGUOUS = "ROW_AMOUNT_AMBIGUOUS"
+    ROW_QUANTITY_UNPARSEABLE = "ROW_QUANTITY_UNPARSEABLE"
     # ── Transactions ────────────────────────────────────────────────────────
     TXN_ID_MISSING = "TXN_ID_MISSING"
     TXN_ID_REUSED = "TXN_ID_REUSED"
@@ -67,6 +70,10 @@ SEVERITY: dict[ErrorCode, Severity] = {
     # Counted in the branch total, left out of the product breakdown, and said so.
     ErrorCode.ROW_MISSING_PRODUCT: Severity.WARNING,
     ErrorCode.ROW_MISSING_QUANTITY: Severity.WARNING,
+    ErrorCode.ROW_AMOUNT_UNPARSEABLE: Severity.REJECTED,
+    # "1,500": one and a half, or fifteen hundred. A person decides (D-019).
+    ErrorCode.ROW_AMOUNT_AMBIGUOUS: Severity.HELD,
+    ErrorCode.ROW_QUANTITY_UNPARSEABLE: Severity.WARNING,
     ErrorCode.TXN_ID_MISSING: Severity.WARNING,
     # Same id, different sale: the till restarted its numbering. Not a duplicate (D-013).
     ErrorCode.TXN_ID_REUSED: Severity.WARNING,

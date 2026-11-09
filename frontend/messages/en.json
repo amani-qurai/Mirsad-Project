@@ -21,6 +21,9 @@
     "FILE_DATE_FORMAT_CHANGED": "The way {file} writes dates has changed. Its rows are held until you confirm the new format once.",
     "PRODUCT_NEW": "{name} did not match any product we know, so it was recorded as a new product. If it is one we already have, link it once.",
     "PRODUCT_MATCH_UNCONFIRMED": "Line {line}: is {name} the same product as {candidates}? Answer once and every row with this spelling follows. Until then it counts in the branch total but not in product figures.",
-    "PRODUCT_NAME_CONFLICT": "Line {line}: the name {name} and the product code {product_code} point to different products. Choose which is right."
+    "PRODUCT_NAME_CONFLICT": "Line {line}: the name {name} and the product code {product_code} point to different products. Choose which is right.",
+    "ROW_AMOUNT_UNPARSEABLE": "Line {line} has an amount we cannot read: {value}.",
+    "ROW_AMOUNT_AMBIGUOUS": "Line {line}: {value} could mean {candidates}. Choose the right amount; we will not guess.",
+    "ROW_QUANTITY_UNPARSEABLE": "Line {line} has a quantity we cannot read: {value}. Its amount still counts."
   }
 }
