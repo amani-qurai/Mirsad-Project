@@ -318,10 +318,12 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 
 ## 4. Phase 0 — Discovery ✅
 
+> **On dates.** The dates written in these documents are the real ones, confirmed by Amani. The git commit timestamps on this branch (all 7 November) come from a wrong machine clock and are not evidence of when anything was sent or received. Where the two disagree, the document wins.
+
 | Deliverable | State |
 |---|---|
 | `docs/decisions/ADR-0001-technology-stack.md` | Written, in PR #1 |
-| `docs/decisions/ADR-0002-hosting-and-deployment.md` | **Approved** 9 Nov — ≈ **ILS 91/mo**, ILS 1,096/yr. Currency corrected from AED |
+| `docs/decisions/ADR-0002-hosting-and-deployment.md` | **Approved** 9 Nov — ≈ **ILS 91/mo**, ILS 1,096/yr at today's rate; **budgeted at ILS 1,175**, the top of the 3.00–3.40 band, because the shekel floats. Currency corrected from AED |
 | `docs/discovery/QUESTIONS.md` | Sent |
 | `docs/discovery/ANSWERS.md` | **Received** — all thirteen answered |
 | `docs/discovery/IMPACT.md` | Written — five defaults changed, three of our assumptions corrected |
@@ -338,15 +340,17 @@ Phase 5  Sprint 4  Seed, hardening, delivery
 
 | Open item | Why it blocks the spec | Asked in |
 |---|---|---|
-| **The trading calendar** — which days each branch does not trade, and which day the week starts on | Week boundaries decide every period comparison; non-trading days decide whether an empty day is normal or a missing file; the branch's local timezone decides which date a late-evening sale lands on. All three are invisible when wrong. **Not one of the thirteen questions covered this** | Update 002 |
-| The Tulkarem file Rania calls *"not really a file"* | If it is a PDF, a scan or a typed table, format handling is a spec decision rather than a sprint-1 surprise. M-008 sniffs CSV-named-`.xls`, not documents | Update 002 |
-| Rania's interview | NN: the client made it a condition. `RANIA-INTERVIEW.md` | §5 |
+| **Rania's interview** | NN: the client made it a condition. `RANIA-INTERVIEW.md` | §5 |
+| **Rania's six weeks of real files** | Matching thresholds and the data quality rules in `SPEC.md` §4 are set against them, not against assumptions | §13 item 8 |
+| ~~The trading calendar~~ | ✅ **Received 9 Nov** (§1.9), hours **11 Nov** (§1.13). Saturday→Thursday, Friday closed, `Asia/Hebron` | — |
+| ~~The Tulkarem file~~ | ✅ **Explained 9 Nov** — dead till, hand-typed Word. Not ingested in block one (§1.10) | — |
 | ~~Data residency~~ | ✅ **Answered 9 Nov: no rule.** Family business, no customer personal data in the exports | — |
 | ~~Hosted or office machine~~ | ✅ **Hosted, approved 9 Nov** at ≈ ILS 91/mo | — |
 | ~~Phone view~~ | ✅ **January**, confirmed 11 Nov | — |
 | ~~Holiday list~~ | ✅ **Received 11 Nov** — Eid ×2, road closures, Bethlehem 24–26 Dec (§1.14) | — |
-| **Four years of quarterly review notes** | M-035. Rania is sending them with the hours. The only work available before Sunday | Update 003 |
-| Whether block two starts 21 Dec or 4 Jan | Scheduling only — needed by 4 December, not now | Update 002 |
+| ~~Whether block two starts 21 Dec or 4 Jan~~ | ✅ **4 January**, confirmed 9 Nov | — |
+
+**Outstanding but not blocking the spec:** Suha's four years of quarterly review notes, for **M-035** (§1.15). The hours arrived without them, so they are still owed — the only thing update 004 asks for.
 
 ---
 
