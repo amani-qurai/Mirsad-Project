@@ -40,7 +40,10 @@ Order is part of the specification, not an implementation detail.
 5. Unify letter forms (alef, hamza-carriers, taa marbuta, alef maksura)
 6. Convert Arabic-Indic digits to Western
 7. Fold Latin case
+   7a. A multiplication sign between digits becomes x          (added, D-017)
+   7b. A decimal mark between digits is kept, unified to "."   (added, D-017)
 8. Strip punctuation and symbols
+   8a. Separate digits from letters with a space               (added, D-017)
 9. Collapse and trim whitespace
 ```
 
@@ -134,10 +137,20 @@ Includes Arabic punctuation (`،` U+060C, `؛` U+061B, `؟` U+061F) and Latin pu
 
 | Input | Output |
 |---|---|
-| `Mug Set - 4pc` | `mug set 4pc` |
+| `Mug Set - 4pc` | `mug set 4 pc` |
 | `طقم أكواب (٤ قطع)` | `طقم اكواب 4 قطع` |
 
 **Reason:** punctuation in product names is decoration applied inconsistently per branch. `Mug Set - 4pc`, `Mug Set (4pc)` and `Mug Set, 4pc` are one product.
+
+### 7a, 7b, 8a — added after the real files arrived (D-017)
+
+| Rule | Input | Output | Reason |
+|---|---|---|---|
+| 7a `×` between digits → `x` | `سجاده ارضية ١٢٠×١٧٠` | `سجاده ارضيه 120 x 170` | Rule 8 would delete `×` but keep the letter `x`, so `120×170` and `120x170` — one rug, written both ways in the exports — would never match |
+| 7b decimal mark between digits kept as `.` | `Glass Jug 1,5 L` · `غلايه كهربائية ١٫٧` | `glass jug 1.5 l` · `غلايه كهرباييه 1.7` | Rule 8 alone turns `1.5` into `15`: a 1.5 L jug and a 15 L box would share a key. `.`, `,` and `٫` all appear between digits in the real names. A thousands separator inside a product name would also become `.`; none exists in the data |
+| 8a space between digits and letters | `Mug Set 6pc` · `FRYING PAN 28CM` | `mug set 6 pc` · `frying pan 28 cm` | Spacing around a unit is typed inconsistently (`6pc` / `6 PC`, `1.7L` / `1.7 L`) and carries no meaning |
+
+The worked example under rule 8 therefore now reads `Mug Set - 4pc` → `mug set 4 pc`.
 
 ### 9. Whitespace — collapse and trim
 
