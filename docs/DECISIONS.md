@@ -286,3 +286,13 @@ Every amount in the six weeks is plain (`457.93`, `-570.65`, `647`). The parser 
 - **No VAT decision:** all six Qalqilya files held — ILS 612,000 visible as held from totals. Branch totals ILS 8,933,974.44.
 - **After `add_vat("qalqilya")`:** Qalqilya ILS 710,256.96 with VAT; one file held (Ramallah week 4). Branch totals **ILS 9,644,231.40**.
 - **Jenin:** discount deducted on 404 rows (392 sales, 12 refunds), ILS 18,000-plus in total, stated per file.
+
+## D-022 — The block-one PR chain merges without a recorded review
+
+**Decided:** 11 Nov 2026 · **By:** Amani
+
+PRs #2–#11 (planning docs, M-008, M-009, M-005, M-006, M-004, M-013, M-011, M-017) are merged into `main` in order without an approving review on GitHub. CLAUDE.md non-negotiable 10 says never merge without review, and the reviewer named above is Imam. Amani judged the team agreed on this chain and chose not to wait for a formal review.
+
+**What this leaves unchecked:** D-018 to D-021 were decided by Amani alone and now reach `main` without a second reader — in particular D-021, which holds Qalqilya's ILS 612,000 from totals until a VAT decision is made.
+
+**Revisit if:** Imam reviews the merged chain and disagrees with any of D-018 to D-021 — fix forward on a new task branch. This entry is not a precedent: later PRs go back to review before merge.
