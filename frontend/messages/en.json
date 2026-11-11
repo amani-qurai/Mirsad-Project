@@ -5,6 +5,14 @@
     "FILE_DELIMITER_UNDETECTED": "We could not tell how the columns in {file} are separated.",
     "FILE_TABLE_AMBIGUOUS": "{file} contains {count, plural, one {# table} other {# tables}}. Choose the one that holds the sales.",
     "FILE_EMPTY": "{file} has no data rows.",
-    "FILE_HEADERS_UNRECOGNISED": "We do not recognise some of the columns in {file}. Tell us once what each one is, and we will remember it for this branch."
+    "FILE_HEADERS_UNRECOGNISED": "We do not recognise some of the columns in {file}. Tell us once what each one is, and we will remember it for this branch.",
+    "FILE_EXACT_DUPLICATE": "{file} is identical to {same_as}, which was already read. It was not counted twice.",
+    "ROW_MISSING_DATE": "Line {line} has no date, so it cannot be placed in a week.",
+    "ROW_MISSING_AMOUNT": "Line {line} has no amount, so there is nothing to count.",
+    "ROW_MISSING_PRODUCT": "Line {line} has no product name. It is counted in the branch total but not in the product figures.",
+    "ROW_MISSING_QUANTITY": "Line {line} has no quantity. Its amount is counted; it is left out of quantity figures.",
+    "TXN_ID_MISSING": "Line {line} has no transaction number. The row is kept and identified by its contents.",
+    "TXN_ID_REUSED": "Transaction number {txn_id} is used for different sales on lines {lines}. This usually means the till restarted its numbering. All of them are kept.",
+    "TXN_DUPLICATE_WITHIN_FILE": "Line {line} is an exact copy of line {same_as_line}, so it was not counted twice."
   }
 }

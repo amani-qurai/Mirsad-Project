@@ -11,6 +11,7 @@ intent for the full set is in
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from enum import StrEnum
 from typing import Any
 
@@ -29,6 +30,16 @@ class ErrorCode(StrEnum):
     FILE_TABLE_AMBIGUOUS = "FILE_TABLE_AMBIGUOUS"
     FILE_EMPTY = "FILE_EMPTY"
     FILE_HEADERS_UNRECOGNISED = "FILE_HEADERS_UNRECOGNISED"
+    FILE_EXACT_DUPLICATE = "FILE_EXACT_DUPLICATE"
+    # ── Row level ───────────────────────────────────────────────────────────
+    ROW_MISSING_DATE = "ROW_MISSING_DATE"
+    ROW_MISSING_AMOUNT = "ROW_MISSING_AMOUNT"
+    ROW_MISSING_PRODUCT = "ROW_MISSING_PRODUCT"
+    ROW_MISSING_QUANTITY = "ROW_MISSING_QUANTITY"
+    # ── Transactions ────────────────────────────────────────────────────────
+    TXN_ID_MISSING = "TXN_ID_MISSING"
+    TXN_ID_REUSED = "TXN_ID_REUSED"
+    TXN_DUPLICATE_WITHIN_FILE = "TXN_DUPLICATE_WITHIN_FILE"
 
 
 SEVERITY: dict[ErrorCode, Severity] = {
@@ -40,7 +51,25 @@ SEVERITY: dict[ErrorCode, Severity] = {
     ErrorCode.FILE_EMPTY: Severity.REJECTED,
     # A person says once what the column is, and the answer is remembered.
     ErrorCode.FILE_HEADERS_UNRECOGNISED: Severity.HELD,
+    ErrorCode.FILE_EXACT_DUPLICATE: Severity.REJECTED,
+    ErrorCode.ROW_MISSING_DATE: Severity.REJECTED,
+    ErrorCode.ROW_MISSING_AMOUNT: Severity.REJECTED,
+    # Counted in the branch total, left out of the product breakdown, and said so.
+    ErrorCode.ROW_MISSING_PRODUCT: Severity.WARNING,
+    ErrorCode.ROW_MISSING_QUANTITY: Severity.WARNING,
+    ErrorCode.TXN_ID_MISSING: Severity.WARNING,
+    # Same id, different sale: the till restarted its numbering. Not a duplicate (D-013).
+    ErrorCode.TXN_ID_REUSED: Severity.WARNING,
+    # Same id and every cell identical: the same line exported twice.
+    ErrorCode.TXN_DUPLICATE_WITHIN_FILE: Severity.REJECTED,
 }
+
+_RANK = {Severity.WARNING: 1, Severity.HELD: 2, Severity.REJECTED: 3}
+
+
+def worst(severities: Iterable[Severity]) -> Severity | None:
+    """The most serious severity in a set, or None if there is nothing to report."""
+    return max(severities, key=_RANK.__getitem__, default=None)
 
 
 class MirsadError(Exception):
