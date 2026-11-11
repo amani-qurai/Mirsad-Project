@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from app.domain.dates import Order
+from app.domain.matching import Catalogue
 from app.errors import SEVERITY, ErrorCode, MirsadError, Severity
 from app.pipeline.filenames import parse_file_name
 from app.pipeline.headers import AmountBasis, Field, map_headers
@@ -72,6 +73,19 @@ class FileReport:
         return sum(r.severity is Severity.HELD for r in self.rows)
 
     @property
+    def rows_in_totals(self) -> int:
+        """Rows that may count in their branch's total today (scope ``total``, file not held)."""
+        if self.held_file:
+            return 0
+        return sum(Scope.TOTAL in r.scope for r in self.rows)
+
+    @property
+    def rows_in_product_figures(self) -> int:
+        if self.held_file:
+            return 0
+        return sum(Scope.PRODUCT in r.scope for r in self.rows)
+
+    @property
     def rows_with_warnings(self) -> int:
         if self.held_file:
             return 0
@@ -112,6 +126,8 @@ class FileReport:
                 "rejected": self.rows_rejected,
                 "held": self.rows_held,
                 "warning": self.rows_with_warnings,
+                "in_totals": self.rows_in_totals,
+                "in_product_figures": self.rows_in_product_figures,
             },
             "codes": {
                 code.value: {"severity": SEVERITY[code].value, "count": len(lines), "lines": lines}
@@ -124,6 +140,24 @@ class FileReport:
 @dataclass(frozen=True)
 class BatchReport:
     files: tuple[FileReport, ...]
+    catalogue: Catalogue | None = None
+
+    def questions(self) -> list[dict[str, Any]]:
+        """The resolve queue: one entry per spelling, not per row ("fix a name once")."""
+        by_name: dict[str, dict[str, Any]] = {}
+        for f in self.files:
+            for row in f.rows:
+                for finding in row.findings:
+                    if finding.code in (ErrorCode.PRODUCT_MATCH_UNCONFIRMED, ErrorCode.PRODUCT_NAME_CONFLICT):
+                        name = finding.context["name"]
+                        entry = by_name.setdefault(
+                            name,
+                            {"code": finding.code.value, "name": name, "candidates": finding.context["candidates"], "rows": 0, "files": []},
+                        )
+                        entry["rows"] += 1
+                        if f.name not in entry["files"]:
+                            entry["files"].append(f.name)
+        return sorted(by_name.values(), key=lambda e: -e["rows"])
 
     @property
     def files_refused(self) -> list[FileReport]:
@@ -141,6 +175,8 @@ class BatchReport:
             "rows_rejected": sum(f.rows_rejected for f in read),
             "rows_held": sum(f.rows_held for f in read),
             "rows_with_warnings": sum(f.rows_with_warnings for f in read),
+            "rows_in_totals": sum(f.rows_in_totals for f in read),
+            "rows_in_product_figures": sum(f.rows_in_product_figures for f in read),
         }
 
     def code_counts(self) -> Counter[ErrorCode]:
@@ -158,6 +194,8 @@ class BatchReport:
         return {
             "totals": self.totals(),
             "codes": {code.value: n for code, n in self.code_counts().most_common()},
+            "products": len(self.catalogue.products) if self.catalogue else None,
+            "questions": self.questions(),
             "files": [f.to_dict() for f in self.files],
         }
 
@@ -167,6 +205,7 @@ def report_file(
     name: str,
     seen: dict[str, str] | None = None,
     date_orders: dict[str, Order] | None = None,
+    catalogue: Catalogue | None = None,
 ) -> FileReport:
     """Read, map and check one file.
 
@@ -186,7 +225,7 @@ def report_file(
         return FileReport(name, digest, error.code, error.context)
 
     parsed = parse_file_name(name)
-    check = check_rows(table, mapping, parsed.period if parsed else None)
+    check = check_rows(table, mapping, parsed.period if parsed else None, catalogue)
     order = check.dates.order
     file_findings: list[Finding] = []
 
@@ -221,13 +260,15 @@ def report_file(
     )
 
 
-def report_batch(paths: list[Path]) -> BatchReport:
+def report_batch(paths: list[Path], catalogue: Catalogue | None = None) -> BatchReport:
     """One batch, in the order given — oldest week first, so a change in a
     branch's date format is caught in the file where it happens. The first of
     two identical files is the one kept."""
     seen: dict[str, str] = {}
     orders: dict[str, Order] = {}
-    return BatchReport(tuple(report_file(p.read_bytes(), p.name, seen, orders) for p in paths))
+    catalogue = catalogue if catalogue is not None else Catalogue()
+    files = tuple(report_file(p.read_bytes(), p.name, seen, orders, catalogue) for p in paths)
+    return BatchReport(files, catalogue)
 
 
 def render_text(report: BatchReport) -> str:
@@ -260,8 +301,16 @@ def render_text(report: BatchReport) -> str:
         f"{t['files']} files ({t['files_refused']} refused, {t['files_held']} held) · {t['rows_in']} rows in · {t['rows_kept']} kept · "
         f"{t['rows_rejected']} rejected · {t['rows_held']} held · {t['rows_with_warnings']} with warnings"
     )
+    out.append(f"  counted in branch totals: {t['rows_in_totals']} · in product figures: {t['rows_in_product_figures']}")
     for code, n in report.code_counts().most_common():
         out.append(f"  {code.value:<28} {SEVERITY[code].value:<9} {n}")
+    if report.catalogue is not None:
+        questions = report.questions()
+        out.append("")
+        out.append(f"{len(report.catalogue.products)} products in the catalogue · {len(questions)} spellings waiting for a person")
+        for q in questions:
+            suggestion = " / ".join(c["name"] for c in q["candidates"]) or "—"
+            out.append(f"  {q['rows']:>5} rows  {q['name']}  →  {suggestion}")
     return "\n".join(out)
 
 
