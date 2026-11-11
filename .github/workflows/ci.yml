@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e 'backend[dev]'
+      - run: python -m pytest -q
+        working-directory: backend
+
+  locales:
+    name: Locale parity (NN-1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/check_locale_parity.py
+
+  web:
+    name: Web tests, typecheck, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  compose:
+    name: docker compose up (AC-1)
+    runs-on: ubuntu-latest
+    needs: [api, web]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose up --build -d --wait
+      - run: curl -fsS http://127.0.0.1:8000/health
+      - run: curl -fsS http://127.0.0.1:3000/health
+      - if: failure()
+        run: docker compose logs
+      - if: always()
+        run: docker compose down -v

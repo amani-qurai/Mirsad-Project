@@ -296,3 +296,19 @@ PRs #2–#11 (planning docs, M-008, M-009, M-005, M-006, M-004, M-013, M-011, M-
 **What this leaves unchecked:** D-018 to D-021 were decided by Amani alone and now reach `main` without a second reader — in particular D-021, which holds Qalqilya's ILS 612,000 from totals until a VAT decision is made.
 
 **Revisit if:** Imam reviews the merged chain and disagrees with any of D-018 to D-021 — fix forward on a new task branch. This entry is not a precedent: later PRs go back to review before merge.
+
+## D-023 — The M-001 scaffold ships no user-visible text
+
+**Decided:** 11 Nov 2026 · **By:** Amani, implemented with Claude Code · **Task:** M-001
+
+**The web app renders an empty shell.** `app/page.tsx` is an empty `<main>`, with no page title. Any text it showed would have to go through `t()` with keys in both locales (NN-1), and next-intl only arrives in M-002. Writing a placeholder sentence now would be the first literal string in the repo. `lang` and `dir` are already set once, on `<html>`, from `src/locale.ts` (NN-3); M-002 replaces the fixed default locale with the per-request one.
+
+**Known gap until M-002:** Next.js's built-in 404 page is in English. It replaces itself when M-002 adds a translated `not-found`.
+
+**Health probes return a token, not prose.** `GET /health` on both the API and the web app returns `{"status": "ok"}`. Compose waits on them, and CI calls them after `docker compose up`.
+
+**The layering rule is now a test.** `backend/tests/test_layering.py` fails if anything in `app/domain` imports `app.api`, `app.repositories` or `app.pipeline`. ADR-0001 §8 named import-linter; a 30-line test does the same job without a new dependency. Swap it for import-linter if the rule set grows.
+
+**Compose carries a local-development database password** (`mirsad-local`), overridable by `POSTGRES_PASSWORD`. It is not a secret: every port is bound to `127.0.0.1`, so the database is not reachable from outside the machine. Hosting (ADR-0002) needs a real secret, set on the server and never committed (NN-11). Host ports are overridable too (`DB_PORT`, `API_PORT`, `WEB_PORT`), because a port already in use on the developer's machine should not need an edit to the compose file.
+
+**Revisit if:** the app is deployed anywhere other than a developer's machine. The compose file is for local use and CI; deployment gets its own configuration.
