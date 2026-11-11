@@ -20,19 +20,24 @@ Every decision gets measured against one question: **does this make the uncertai
 
 ## The gate
 
-No application code is written until `docs/SPEC.md` is approved. If you are asked to implement something that is not in an approved spec and does not have a task ID, stop and say so.
+Every piece of application code belongs to a task ID in `docs/PROJECT-PLAN.md` §7. If you are asked to implement something that has no task ID, stop and say so.
+
+The original gate — no code until `docs/SPEC.md` is approved — **was waived by the reviewer on 9 November 2026** (`docs/DECISIONS.md` D-001). There is no `SPEC.md`. Scope is the task list, the client's words, and the decisions log, read together.
 
 Read before you build:
 
 | Document | What it settles |
 |---|---|
+| `docs/DECISIONS.md` | Every decision taken since the client thread closed. **Where it disagrees with anything below, it wins** |
 | `docs/decisions/ADR-0001-technology-stack.md` | Stack, and the layering in §6 |
-| `docs/discovery/ANSWERS.md` | The client's own words. Where this disagrees with anything else, this wins |
+| `docs/discovery/ANSWERS.md` | The client's own words. Wins over everything except `DECISIONS.md` |
+| `docs/discovery/RANIA-MEETING.md` | What the weekly user needs, and what is wrong with each branch's file |
 | `docs/discovery/IMPACT.md` | What those answers changed, including where our earlier defaults were wrong |
-| `docs/PROJECT-PLAN.md` | Sprints, task IDs, Definition of Done |
-| `docs/SPEC.md` | Scope — including what is explicitly *not* built |
+| `docs/PROJECT-PLAN.md` | Sprints, task IDs, Definition of Done. Its dates are superseded by `DECISIONS.md` D-002 |
 
-The client trades in **dirhams (AED)**, locales `ar-AE` and `en-AE`. An earlier draft said Saudi riyals; that was our assumption and it was wrong.
+The client is in **Palestine** and trades in **shekels (ILS)**, locales `ar-PS` and `en-PS`, timezone **Asia/Hebron**. The trading week runs **Saturday to Thursday; Friday is closed everywhere**.
+
+We have had this wrong twice: we assumed Saudi riyals, the client corrected us to dirhams, and she later corrected herself to shekels. **The second error was found by asking about branch names, not about currency** — asking the same question again would have produced the same wrong answer. Currency, locale, timezone and week start all live in configuration, never in a literal.
 
 ---
 
@@ -100,7 +105,7 @@ An ambiguous date is **held**, never guessed. A product match below threshold is
 
 **And a second axis: scope.** Severity says what happened to a row; scope says which figures may use it. A row with a date, a branch and an amount but no product belongs in that branch's total and not in the product breakdown — so it is a `warning` with scope `{total}`, not a rejection. Rejecting it would under-report branch totals with no visible symptom, which is the original failure this project exists to prevent.
 
-Every figure therefore states its own completeness: *"this branch's total includes 34 rows with no product, worth AED 2,100."* Traceability says where a number came from; completeness says what is missing from it.
+Every figure therefore states its own completeness: *"this branch's total includes 34 rows with no product, worth ILS 2,100."* Traceability says where a number came from; completeness says what is missing from it.
 
 Collapsing `held` into `rejected` would quietly discard recoverable data. Collapsing it into `warning` would put unverified numbers on the dashboard. Keep all three.
 
@@ -125,6 +130,8 @@ Run the Definition of Done checklist in `docs/PROJECT-PLAN.md` §8. Check the sc
 Load the **`mirsad-conventions`** skill before touching Arabic text handling, error codes, rejection reasons, or any user-facing string. It holds the normalisation rule table, the error-code catalogue and the i18n checklist — the detail that is too long to live here.
 
 ### When something is unclear
-Ask. Do not invent an assumption and build on it.
+The client thread is closed, so there is no one to ask. **Decide, write the decision and the reason in `docs/DECISIONS.md`, and keep building.** Do not stop and wait.
 
-This project exists because someone built reports on data nobody checked. A guess buried in a function is the same failure in a different place. If a requirement is ambiguous, say what is ambiguous and what you would need in order to proceed — that is a useful answer, and it is exactly what we are asking the software itself to do.
+What is still forbidden is an assumption nobody can see. This project exists because someone built reports on data nobody checked; a guess buried in a function is the same failure in a different place. A decision in the log can be found, questioned and reversed in an hour. A guess in the code cannot.
+
+The software works the same way at runtime: when *it* cannot decide — an ambiguous date, a weak product match — it holds the row and says so. It does not decide on the user's behalf.

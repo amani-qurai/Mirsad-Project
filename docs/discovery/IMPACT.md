@@ -16,6 +16,12 @@ Eight of thirteen defaults were confirmed. The other five, plus one correction t
 Three things she told us were not answers to our questions at all. They were corrections:
 
 1. **The currency is wrong in our committed documents.** We assumed Saudi riyals. Nakheel Retail is in the UAE and trades in dirhams.
+
+> **Superseded 2026-11-09, and this one is worth reading twice.** The client corrected herself: **the business is in Palestine and trades in shekels (ILS).** So this document's correction was itself wrong.
+>
+> The point is not that she erred. It is *how the error was caught*: not by asking about currency again — she would have reconfirmed AED — but by a question about **branch names and the trading week**. Two of the eleven branches are Ramallah and Tulkarem.
+>
+> **Repetition re-collects a belief; a cross-check from an unrelated angle tests it.** `PROJECT-PLAN.md` §1.8 turns that into a rule for the rest of discovery, and it is the same pattern the matching engine already uses on product codes versus product names.
 2. **Our rule for an unusable row was too strict**, and would have silently produced the exact failure this project exists to prevent.
 3. **We asked thirteen questions about her data and none about her decisions.** She is right, and she answered the question we should have asked.
 
