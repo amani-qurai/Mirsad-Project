@@ -19,11 +19,13 @@ Two axes per row:
 
 from __future__ import annotations
 
+import datetime as dt
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
+from app.domain.dates import FileDates, Period, infer_dates
 from app.errors import SEVERITY, ErrorCode, Severity, worst
 from app.pipeline.headers import Field, HeaderMapping
 from app.pipeline.readers import RawRow, RawTable
@@ -50,6 +52,7 @@ class RowResult:
     line: int
     findings: tuple[Finding, ...]
     scope: frozenset[Scope]
+    date: dt.date | None = None  # set only when the date is certain or inferred, never guessed
 
     @property
     def severity(self) -> Severity | None:
@@ -69,7 +72,14 @@ def _value(row: RawRow, mapping: HeaderMapping, f: Field) -> str | None:
     return cell if cell is not None and cell.strip() else None
 
 
-def check_rows(table: RawTable, mapping: HeaderMapping) -> tuple[RowResult, ...]:
+@dataclass(frozen=True)
+class TableCheck:
+    rows: tuple[RowResult, ...]
+    dates: FileDates
+
+
+def check_rows(table: RawTable, mapping: HeaderMapping, period: Period | None = None) -> TableCheck:
+    """Check every row. ``period`` is the week the file covers, if known (D-015)."""
     findings: dict[int, list[Finding]] = {row.line: [] for row in table.rows}
 
     for row in table.rows:
@@ -91,12 +101,20 @@ def check_rows(table: RawTable, mapping: HeaderMapping) -> tuple[RowResult, ...]
     if mapping.has(Field.TXN_ID):
         _check_repeated_ids(table, mapping, findings)
 
+    # Dates are decided once for the whole file (M-006). An empty date is
+    # already ROW_MISSING_DATE above, so infer_dates returns None for it.
+    dates = infer_dates([_value(row, mapping, Field.DATE) for row in table.rows], period)
+    for row, result in zip(table.rows, dates.results):
+        if result is not None and result.code is not None:
+            findings[row.line].append(Finding(result.code, result.context))
+
     results = []
-    for row in table.rows:
+    for row, result in zip(table.rows, dates.results):
         # Every finding carries its line, so a message can name it without a lookup.
         found = tuple(Finding(f.code, {**f.context, "line": row.line}) for f in findings[row.line])
-        results.append(RowResult(row.line, found, _scope(row, mapping, found)))
-    return tuple(results)
+        when = result.value if result is not None else None
+        results.append(RowResult(row.line, found, _scope(row, mapping, found), when))
+    return TableCheck(tuple(results), dates)
 
 
 def _check_repeated_ids(table: RawTable, mapping: HeaderMapping, findings: dict[int, list[Finding]]) -> None:
