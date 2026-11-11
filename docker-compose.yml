@@ -1,0 +1,60 @@
+# Mirsad — one command on a clean machine: `docker compose up` (AC-1, ADR-0001 F12).
+#
+# The database password below is a local-development default, not a secret:
+# the database is reachable only on this machine. Override it by exporting
+# POSTGRES_PASSWORD; never commit a .env file (NN-11).
+#
+# Host ports default to 5432 / 8000 / 3000. If one is taken on your machine,
+# export DB_PORT, API_PORT or WEB_PORT before `make up`.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mirsad
+      POSTGRES_USER: mirsad
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mirsad-local}
+      TZ: Asia/Hebron
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mirsad -d mirsad"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql://mirsad:${POSTGRES_PASSWORD:-mirsad-local}@db:5432/mirsad
+      TZ: Asia/Hebron
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build: ./frontend
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  db-data:
