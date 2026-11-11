@@ -29,6 +29,7 @@ from typing import Any
 from app.domain.dates import FileDates, Period, infer_dates
 from app.domain.matching import Catalogue
 from app.domain.numbers import parse_amount
+from app.config import MONEY_PLACES
 from app.domain.returns import convention, signed_amount
 from app.errors import SEVERITY, ErrorCode, Severity, worst
 from app.pipeline.headers import Field, HeaderMapping
@@ -85,6 +86,8 @@ class TableCheck:
     rows: tuple[RowResult, ...]
     dates: FileDates
     return_convention: str | None = None  # "negative", "rtn_note", "both", or None: no returns at all
+    discount_rows: int = 0
+    discount_total: Decimal = Decimal(0)
 
 
 def check_rows(
@@ -92,17 +95,21 @@ def check_rows(
     mapping: HeaderMapping,
     period: Period | None = None,
     catalogue: Catalogue | None = None,
+    vat_rate: Decimal | None = None,
 ) -> TableCheck:
     """Check every row.
 
     ``period`` is the week the file covers, if known (D-015). ``catalogue``
     is the product catalogue to match against; it is updated as new products
     are found, so files must be checked in the order they arrived.
+    ``vat_rate`` is added to every amount — passed only when a person has
+    decided it for this branch (D-021).
     """
     findings: dict[int, list[Finding]] = {row.line: [] for row in table.rows}
     amounts: dict[int, Decimal] = {}
     quantities: dict[int, Decimal] = {}
     returns: dict[int, str] = {}
+    discounts: list[Decimal] = []
 
     for row in table.rows:
         found = findings[row.line]
@@ -129,7 +136,19 @@ def check_rows(
                 found.append(Finding(ErrorCode.ROW_AMOUNT_UNPARSEABLE, {"value": raw_amount}))
             else:
                 signed = signed_amount(parsed.value, _value(row, mapping, Field.NOTES))
-                amounts[row.line] = signed.amount
+                amount = signed.amount
+                raw_discount = _value(row, mapping, Field.DISCOUNT)
+                if raw_discount is not None:
+                    discount = parse_amount(raw_discount).value
+                    if discount is None:
+                        found.append(Finding(ErrorCode.ROW_DISCOUNT_UNPARSEABLE, {"value": raw_discount}))
+                    elif discount:
+                        # The discount reduces what changed hands, sale or refund (D-021).
+                        amount = amount - abs(discount) if amount >= 0 else amount + abs(discount)
+                        discounts.append(abs(discount))
+                if vat_rate is not None:
+                    amount = (amount * (1 + vat_rate)).quantize(MONEY_PLACES)
+                amounts[row.line] = amount
                 if signed.is_return:
                     returns[row.line] = "rtn_note" if signed.flipped or parsed.value >= 0 else "negative"
                 if signed.flipped:
@@ -179,6 +198,7 @@ def check_rows(
     by_kind = list(returns.values())
     return TableCheck(
         tuple(results), dates, convention(by_kind.count("negative"), by_kind.count("rtn_note")),
+        len(discounts), sum(discounts, Decimal(0)),
     )
 
 
@@ -219,6 +239,7 @@ WITHHOLDS: dict[ErrorCode, Scope] = {
     ErrorCode.DATE_FORMAT_AMBIGUOUS: Scope.TOTAL,
     ErrorCode.ROW_DATE_OUT_OF_RANGE: Scope.TOTAL,
     ErrorCode.ROW_AMOUNT_AMBIGUOUS: Scope.TOTAL,
+    ErrorCode.ROW_DISCOUNT_UNPARSEABLE: Scope.TOTAL,
     ErrorCode.ROW_QUANTITY_UNPARSEABLE: Scope.QUANTITY,
     ErrorCode.PRODUCT_MATCH_UNCONFIRMED: Scope.PRODUCT,
     ErrorCode.PRODUCT_NAME_CONFLICT: Scope.PRODUCT,

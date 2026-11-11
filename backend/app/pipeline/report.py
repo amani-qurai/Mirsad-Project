@@ -23,12 +23,26 @@ from typing import Any
 
 from app.domain.dates import Order
 from app.domain.matching import Catalogue
+from app.config import VAT_RATE
 from app.domain.returns import NO_RETURNS_MIN_ROWS
 from app.errors import SEVERITY, ErrorCode, MirsadError, Severity
 from app.pipeline.filenames import parse_file_name
 from app.pipeline.headers import AmountBasis, Field, map_headers
 from app.pipeline.readers import read_bytes
 from app.pipeline.validate import Finding, RowResult, Scope, check_rows
+
+
+@dataclass
+class Decisions:
+    """Answers a person has given once, per branch, that later files follow.
+
+    Kept beside the product catalogue; storing both is the repositories' job.
+    """
+
+    vat_added: dict[str, Decimal] = field(default_factory=dict)  # branch → rate
+
+    def add_vat(self, branch: str, rate: Decimal = VAT_RATE) -> None:
+        self.vat_added[branch] = rate
 
 
 @dataclass(frozen=True)
@@ -241,6 +255,7 @@ def report_file(
     seen: dict[str, str] | None = None,
     date_orders: dict[str, Order] | None = None,
     catalogue: Catalogue | None = None,
+    decisions: Decisions | None = None,
 ) -> FileReport:
     """Read, map and check one file.
 
@@ -260,9 +275,27 @@ def report_file(
         return FileReport(name, digest, error.code, error.context)
 
     parsed = parse_file_name(name)
-    check = check_rows(table, mapping, parsed.period if parsed else None, catalogue)
-    order = check.dates.order
+    branch = parsed.branch if parsed else None
     file_findings: list[Finding] = []
+
+    vat_rate = None
+    if mapping.amount_basis is AmountBasis.EX_VAT:
+        decided = (decisions.vat_added.get(branch) if decisions and branch else None)
+        if decided is None:
+            # Not multiplied. Held, loudly, until a person decides for the branch.
+            file_findings.append(Finding(ErrorCode.FILE_AMOUNTS_EX_VAT, {
+                "file": name, "branch": branch, "suggested_rate": str(VAT_RATE), "evidence": "header",
+            }))
+        else:
+            vat_rate = decided
+            file_findings.append(Finding(ErrorCode.FILE_VAT_ADDED, {"file": name, "branch": branch, "rate": str(decided)}))
+
+    check = check_rows(table, mapping, parsed.period if parsed else None, catalogue, vat_rate)
+    order = check.dates.order
+    if check.discount_rows:
+        file_findings.append(Finding(ErrorCode.FILE_DISCOUNT_DEDUCTED, {
+            "file": name, "rows": check.discount_rows, "total": str(check.discount_total),
+        }))
 
     sales = sum(1 for r in check.rows if r.kept and r.amount is not None and not r.is_return)
     if check.return_convention is None and sales >= NO_RETURNS_MIN_ROWS:
@@ -300,14 +333,16 @@ def report_file(
     )
 
 
-def report_batch(paths: list[Path], catalogue: Catalogue | None = None) -> BatchReport:
+def report_batch(
+    paths: list[Path], catalogue: Catalogue | None = None, decisions: Decisions | None = None,
+) -> BatchReport:
     """One batch, in the order given — oldest week first, so a change in a
     branch's date format is caught in the file where it happens. The first of
     two identical files is the one kept."""
     seen: dict[str, str] = {}
     orders: dict[str, Order] = {}
     catalogue = catalogue if catalogue is not None else Catalogue()
-    files = tuple(report_file(p.read_bytes(), p.name, seen, orders, catalogue) for p in paths)
+    files = tuple(report_file(p.read_bytes(), p.name, seen, orders, catalogue, decisions) for p in paths)
     return BatchReport(files, catalogue)
 
 

@@ -41,6 +41,10 @@ class ErrorCode(StrEnum):
     ROW_QUANTITY_UNPARSEABLE = "ROW_QUANTITY_UNPARSEABLE"
     ROW_RETURN_SIGN_FLIPPED = "ROW_RETURN_SIGN_FLIPPED"
     FILE_NO_RETURNS = "FILE_NO_RETURNS"
+    FILE_AMOUNTS_EX_VAT = "FILE_AMOUNTS_EX_VAT"
+    FILE_VAT_ADDED = "FILE_VAT_ADDED"
+    FILE_DISCOUNT_DEDUCTED = "FILE_DISCOUNT_DEDUCTED"
+    ROW_DISCOUNT_UNPARSEABLE = "ROW_DISCOUNT_UNPARSEABLE"
     # ── Transactions ────────────────────────────────────────────────────────
     TXN_ID_MISSING = "TXN_ID_MISSING"
     TXN_ID_REUSED = "TXN_ID_REUSED"
@@ -80,6 +84,13 @@ SEVERITY: dict[ErrorCode, Severity] = {
     ErrorCode.ROW_RETURN_SIGN_FLIPPED: Severity.WARNING,
     # Many sales, not one refund: returns are probably recorded elsewhere, or not at all.
     ErrorCode.FILE_NO_RETURNS: Severity.WARNING,
+    # Pre-VAT amounts and no decision yet for this branch: held, not silently
+    # multiplied (Imam's letter; D-021). One answer per branch releases every file.
+    ErrorCode.FILE_AMOUNTS_EX_VAT: Severity.HELD,
+    ErrorCode.FILE_VAT_ADDED: Severity.WARNING,
+    # Jenin's amounts are before discount; the file's own discount column is deducted.
+    ErrorCode.FILE_DISCOUNT_DEDUCTED: Severity.WARNING,
+    ErrorCode.ROW_DISCOUNT_UNPARSEABLE: Severity.HELD,
     ErrorCode.TXN_ID_MISSING: Severity.WARNING,
     # Same id, different sale: the till restarted its numbering. Not a duplicate (D-013).
     ErrorCode.TXN_ID_REUSED: Severity.WARNING,

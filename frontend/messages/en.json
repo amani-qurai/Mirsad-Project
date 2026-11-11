@@ -26,6 +26,10 @@
     "ROW_AMOUNT_AMBIGUOUS": "Line {line}: {value} could mean {candidates}. Choose the right amount; we will not guess.",
     "ROW_QUANTITY_UNPARSEABLE": "Line {line} has a quantity we cannot read: {value}. Its amount still counts.",
     "ROW_RETURN_SIGN_FLIPPED": "Line {line} is marked {note} with a positive amount of {value}. It was counted as a refund of {value}, not a sale.",
-    "FILE_NO_RETURNS": "{file} has {rows} sales and not a single refund. Refunds may be recorded somewhere else, or not at all; this branch's total may be too high."
+    "FILE_NO_RETURNS": "{file} has {rows} sales and not a single refund. Refunds may be recorded somewhere else, or not at all; this branch's total may be too high.",
+    "FILE_AMOUNTS_EX_VAT": "{file} records amounts before VAT. Its rows are held until you decide, once for {branch}, whether to add VAT at {suggested_rate}.",
+    "FILE_VAT_ADDED": "{file} records amounts before VAT. As decided for {branch}, VAT at {rate} was added to every amount.",
+    "FILE_DISCOUNT_DEDUCTED": "{file} records amounts before discount. The discount column was deducted on {rows} rows, worth {total} in all.",
+    "ROW_DISCOUNT_UNPARSEABLE": "Line {line} has a discount we cannot read: {value}. The row is held from totals until it is checked."
   }
 }
