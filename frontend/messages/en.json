@@ -24,6 +24,8 @@
     "PRODUCT_NAME_CONFLICT": "Line {line}: the name {name} and the product code {product_code} point to different products. Choose which is right.",
     "ROW_AMOUNT_UNPARSEABLE": "Line {line} has an amount we cannot read: {value}.",
     "ROW_AMOUNT_AMBIGUOUS": "Line {line}: {value} could mean {candidates}. Choose the right amount; we will not guess.",
-    "ROW_QUANTITY_UNPARSEABLE": "Line {line} has a quantity we cannot read: {value}. Its amount still counts."
+    "ROW_QUANTITY_UNPARSEABLE": "Line {line} has a quantity we cannot read: {value}. Its amount still counts.",
+    "ROW_RETURN_SIGN_FLIPPED": "Line {line} is marked {note} with a positive amount of {value}. It was counted as a refund of {value}, not a sale.",
+    "FILE_NO_RETURNS": "{file} has {rows} sales and not a single refund. Refunds may be recorded somewhere else, or not at all; this branch's total may be too high."
   }
 }

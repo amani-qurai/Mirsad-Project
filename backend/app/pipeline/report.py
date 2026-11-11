@@ -23,6 +23,7 @@ from typing import Any
 
 from app.domain.dates import Order
 from app.domain.matching import Catalogue
+from app.domain.returns import NO_RETURNS_MIN_ROWS
 from app.errors import SEVERITY, ErrorCode, MirsadError, Severity
 from app.pipeline.filenames import parse_file_name
 from app.pipeline.headers import AmountBasis, Field, map_headers
@@ -46,6 +47,7 @@ class FileReport:
     week_start: str | None = None
     date_order: Order | None = None
     date_order_evidence: str | None = None  # "file" or "week"
+    return_convention: str | None = None
     # File-level findings that do not stop the rows being read, e.g. a change
     # in date format. A held one holds every kept row in the file.
     file_findings: tuple[Finding, ...] = ()
@@ -139,6 +141,7 @@ class FileReport:
             "week_start": self.week_start,
             "date_order": self.date_order.value if self.date_order else None,
             "date_order_evidence": self.date_order_evidence,
+            "return_convention": self.return_convention,
             "file_findings": [
                 {"code": f.code.value, "severity": f.severity.value, "context": f.context} for f in self.file_findings
             ],
@@ -261,6 +264,10 @@ def report_file(
     order = check.dates.order
     file_findings: list[Finding] = []
 
+    sales = sum(1 for r in check.rows if r.kept and r.amount is not None and not r.is_return)
+    if check.return_convention is None and sales >= NO_RETURNS_MIN_ROWS:
+        file_findings.append(Finding(ErrorCode.FILE_NO_RETURNS, {"file": name, "rows": sales}))
+
     if check.dates.conflicting:
         # Values only readable as day/month and values only readable as
         # month/day in one file: the till changed format mid-file.
@@ -287,6 +294,7 @@ def report_file(
         week_start=parsed.week_start.isoformat() if parsed else None,
         date_order=order,
         date_order_evidence=check.dates.order_evidence,
+        return_convention=check.return_convention,
         file_findings=tuple(file_findings),
         rows=check.rows,
     )
@@ -318,8 +326,11 @@ def render_text(report: BatchReport) -> str:
             flags.append("PRE-VAT")
         if f.date_order is not None:
             flags.append(f"dates {f.date_order.value}" + (" (by week)" if f.date_order_evidence == "week" else ""))
+        if f.return_convention:
+            flags.append(f"returns {f.return_convention}")
         for finding in f.file_findings:
-            flags.append(f"{finding.severity.value.upper()} {finding.code.value} {finding.context.get('previous', '')}→{finding.context.get('current', '')}")
+            change = f" {finding.context['previous']}→{finding.context['current']}" if "previous" in finding.context else ""
+            flags.append(f"{finding.severity.value.upper()} {finding.code.value}{change}")
         flag = f" [{', '.join(flags)}]" if flags else ""
         out.append(
             f"{f.name:<38} in {f.rows_in:>4} · kept {f.rows_kept:>4} · rejected {f.rows_rejected:>2}"

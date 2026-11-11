@@ -250,3 +250,15 @@ Every amount in the six weeks is plain (`457.93`, `-570.65`, `647`). The parser 
 **Every count in the report now has its worth beside it**: in totals, held from totals, rejected, and in totals but outside product figures. *"This branch's total includes 34 rows with no product, worth ILS 2,100"* can now be written from the report.
 
 **Result on six weeks:** nothing unreadable or ambiguous. ILS 9,663,356.01 in branch totals before returns and VAT are handled; ILS 205,860.42 held from totals (Ramallah week 4); ILS 38,336.11 in rejected rows.
+
+## D-020 — Returns: flipped where the till says RTN, recorded every time
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-011
+
+- **Negative amount** → a refund, as written. Eight branches.
+- **Positive amount with `RTN` in the notes** → a refund: the sign is flipped **and the row carries `ROW_RETURN_SIGN_FLIPPED`**, so the correction Rania has made by hand for four years is now visible and traceable. Jericho and Salfit.
+- **Negative and `RTN`** → already a refund; not flipped twice.
+- Only `RTN` is recognised. Another word (`refund`, `مرتجع`) is not assumed to mean the same until it is seen in a file and confirmed here.
+- **A file with 50 or more sales and no refunds at all** → `FILE_NO_RETURNS`, a warning: the figures stand, with the caveat that refunds may be recorded elsewhere or not at all.
+
+**Result on six weeks:** 98 `RTN` rows flipped (Jericho 52, Salfit 46). Branch totals fell by ILS 99,974.70, which is twice the refunds: read naively, they had been added as sales instead of subtracted. **All six Tulkarem files have no refunds** and are flagged; no other file is.
