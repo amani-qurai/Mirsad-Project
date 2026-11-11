@@ -192,3 +192,17 @@ Held rather than a warning because the risk is exactly the one this project exis
 **Result on six weeks:** Ramallah reads month-first in weeks 1–3 and day-first from week 4, matching the closing letter. Week 4 (18 Oct, 495 rows) is held. No other branch changes.
 
 **Known noise, kept on purpose:** 8,236 rows carry `DATE_FORMAT_INFERRED`, so "rows with warnings" is dominated by it and the 774 missing-product rows are harder to see. The per-row code stays because drill-down must show how each date was read. **Revisit in M-017**: the data quality screen should state the inference once per file and list the rows behind it, rather than count it beside warnings that need attention.
+
+## D-017 — Three normalisation rules added from the real names
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-004
+
+The rule table in `.claude/skills/mirsad-conventions/references/arabic-normalisation.md` was written before the files arrived. Applied to the 116 real product spellings, it had two defects and one gap:
+
+- **A decimal point was deleted as punctuation**, so `1.5` became `15` — a 1.5 L jug and a 15 L box would share a key. A decimal mark between digits (`.`, `,`, `٫`) is now kept, as `.`.
+- **`×` was deleted but `x` kept**, so `120×170` never matched `120x170` — the same rug, written both ways. `×` between digits now becomes `x`.
+- **`6pc` vs `6 PC`, `1.7L` vs `1.7 L`**: a space is now inserted wherever digits meet letters.
+
+The rule table is updated with all three and their reasons. No existing rule was weakened.
+
+**Result:** 116 spellings → 96 comparison keys. Of the 20 merges, every one is the same product; **no key appears under two product codes.** The remaining 96 keys cover 25 products, mostly because Arabic and English names are never matched to each other — by design, that is a person's decision, made once.
