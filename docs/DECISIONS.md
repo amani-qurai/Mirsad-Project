@@ -111,3 +111,18 @@ Windows-1256 decodes almost any byte sequence without error, so "it decoded" is 
 Jenin's export is Windows-1256, which has no Arabic-Indic digits. Product names that contained them arrive with literal `?` in their place (`مقلاه ?? سم`). The information is gone at source; no decoder recovers it.
 
 **Decision:** the reader keeps the `?` exactly as received. Product matching (M-013) must treat `?` as an unknown character, not a literal — so `مقلاه ?? سم` can be *held* against `مقلاة 28 سم`, never auto-merged. Recorded here so it is not "fixed" quietly in the reader.
+
+## D-012 — Header mapping: known names only, every column accounted for
+
+**Decided:** 10 Nov 2026 · **By:** Amani · **Task:** M-008
+
+Each branch's column names map to eight standard fields: transaction id, date, product code, product name, quantity, amount, discount, notes. The table of known names in `backend/app/pipeline/headers.py` holds **exactly the headers seen in the six weeks of real files**, nothing guessed beyond them.
+
+- Headers are compared after case, spacing and underscores are ignored. No Arabic letter normalisation is applied — exact names have been enough, and any Arabic rule belongs in `domain/arabic` (NN-5).
+- **A column nobody recognises holds the file** (`FILE_HEADERS_UNRECOGNISED`) rather than being dropped. A new column can change what the others mean — Jenin's separate discount column is exactly that case. A person names the column once and the answer is remembered for that branch.
+- **Date and amount are required.** Product, code, quantity and transaction id are not: Tulkarem's Word table has no id and no code, and still has to be read (D-003). What a missing field means for each row is validation's decision (M-009), not the mapper's.
+- **`AMOUNT_EXVAT` marks the file's amounts as pre-VAT.** The mapping records it so the data quality report can say so. Nothing multiplies by 1.16 at this stage, or silently at any stage.
+
+**Result on the real files:** all 67 branch files map completely. The six Qalqilya files are marked pre-VAT. The review-notes workbook is held, correctly, because it is not a branch export.
+
+**Revisit if:** a till changes its export headers. That arrives as a held file with the unknown column named, which is the intended behaviour.
